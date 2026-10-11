@@ -1,0 +1,63 @@
+/* Design tokens extracted from design/export (Claude Design, child screens 1–8). */
+:root {
+  /* Grounds */
+  --c-cream: #F8EFD9;          /* app background */
+  --c-paper: #FFF8EA;          /* home button, play glyph */
+  --c-ink: #3B2F2A;            /* icons */
+  --c-ink-soft: rgba(59, 47, 42, .5);
+  --c-ink-ghost: rgba(59, 47, 42, .07);
+  --c-ink-shadow: rgba(59, 47, 42, .12);
+  --c-focus: #3B6EA8;
+
+  /* Accent */
+  --c-terracotta: #D9714F;
+  --c-terracotta-deep: #B5583B;
+  --c-butter: #F5E2A8;
+  --c-honey: #F2D27E;
+  --c-sun: #F2B544;
+  --c-meadow: #E3E9CF;
+
+  /* Category tile tints (fill / pressed-edge shadow) */
+  --tint-sage: #DCE6C9;   --tint-sage-edge: #BFCDA6;
+  --tint-sky: #D3E3EE;    --tint-sky-edge: #B2CADB;
+  --tint-peach: #F4D2C0;  --tint-peach-edge: #DDB29C;
+  --tint-butter: #F5E2A8; --tint-butter-edge: #DDC57F;
+  --tint-lilac: #E2D8EE;  --tint-lilac-edge: #C6B8DA;
+
+  /* Session ending */
+  --c-dusk: #E9A27C;
+  --c-goodbye-sky: #E8CDD6;
+  --c-goodbye-ground: #F4D2C0;
+  --c-moon: #FFF3D6;
+  --c-hill-back: #B9CBA0;
+  --c-hill-front: #CFDDB8;
+  --c-night: #2E3550;
+  --c-night-ground: #262C44;
+  --c-night-line: #C9CFE6;
+  --c-moonface: #F5E2A8;
+
+  /* Parent screens */
+  --c-parent-bg: #FBF8F1;
+  --c-parent-card: #FFFFFF;
+  --c-parent-text: #1F1E1D;
+  --c-parent-muted: #6B6A68;
+  --c-parent-line: #E4DFD3;
+
+  /* Radii (design px, multiply by --u) */
+  --r-tile: 56;
+  --r-tile-phone: 40;
+  --r-subject: 72;
+  --r-home: 40;
+  --r-home-phone: 26;
+
+  /* Type */
+  --font-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-parent-body: 17px;
+
+  /* Motion (all child animations stay under 600 ms) */
+  --t-press: 140ms;
+  --t-bounce: 520ms;
+  --t-ring: 560ms;
+  --t-enter: 320ms;
+  --ease-bounce: cubic-bezier(.3, .7, .4, 1);
+}

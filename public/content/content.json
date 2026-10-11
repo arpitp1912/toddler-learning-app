@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "categories": [
+    {
+      "id": "animals",
+      "module": "cards",
+      "icon": "img/animals/cow.webp",
+      "tint": "sage"
+    },
+    {
+      "id": "sounds",
+      "module": "cards",
+      "icon": "img/sounds/car.webp",
+      "tint": "sky",
+      "badge": "sound"
+    },
+    {
+      "id": "things",
+      "module": "cards",
+      "icon": "img/things/apple.webp",
+      "tint": "butter"
+    }
+  ],
+  "items": [
+    {
+      "id": "cow",
+      "category": "animals",
+      "word": "cow",
+      "image": "img/animals/cow.webp",
+      "anim": "bounce",
+      "tags": [
+        "farm"
+      ]
+    },
+    {
+      "id": "duck",
+      "category": "animals",
+      "word": "duck",
+      "image": "img/animals/duck.webp",
+      "anim": "wiggle",
+      "tags": [
+        "farm"
+      ]
+    },
+    {
+      "id": "car",
+      "category": "sounds",
+      "word": "car",
+      "image": "img/sounds/car.webp",
+      "anim": "wiggle",
+      "tags": [
+        "vehicles",
+        "street"
+      ]
+    },
+    {
+      "id": "apple",
+      "category": "things",
+      "word": "apple",
+      "image": "img/things/apple.webp",
+      "anim": "bounce",
+      "tags": [
+        "food"
+      ]
+    }
+  ],
+  "decor": {
+    "start": [
+      "cow",
+      "duck"
+    ],
+    "goodbye": [
+      "cow",
+      "duck"
+    ]
+  },
+  "scenes": [
+    {
+      "id": "farm",
+      "image": "img/scenes/farm.webp",
+      "hotspots": []
+    }
+  ],
+  "letters": [
+    {
+      "letter": "A",
+      "itemId": "apple"
+    }
+  ],
+  "counting": [
+    {
+      "itemId": "apple"
+    },
+    {
+      "itemId": "duck"
+    }
+  ]
+}
