@@ -12,7 +12,7 @@ An offline-capable, installable web app for toddlers aged 18–30 months. It rep
 
 ## 3. Design principles (non-negotiable)
 - No text in the child-facing UI. Pictures and sound only.
-- Tap targets at least 25% of the short screen edge on phone and at least 160 px on iPad.
+- Tap targets at least 25% of the short screen edge on phone and at least 160 px on iPad. On iPhone the hit area is held at 25% of the short edge even where the scaled visual is smaller.
 - Every tap produces a response. No wrong answers, no error states, no dead zones.
 - No scores, streaks, stars, rewards, ads, external links or autoplay chains.
 - Gestures: tap is primary. Horizontal swipe is optional and never required.
@@ -47,7 +47,7 @@ An offline-capable, installable web app for toddlers aged 18–30 months. It rep
 
 ## 6. Child-facing modules (v1)
 1. **Home:** 4–5 giant picture tiles: Animals, Sounds, Places, Counting, Letters. Which tiles appear is set per profile.
-2. **Cards:** one item fills the screen. Tapping the item plays the word, then the sound, then a bounce or wiggle animation. Tapping the right or left edge, or swiping, moves to the next or previous card. A home button sits in a corner and is large and icon-only.
+2. **Cards:** one item fills the screen. Tapping the item starts the bounce or wiggle animation immediately and plays the word, then the sound. Tapping the right or left edge, or swiping, moves to the next or previous card. A home button sits in a corner and is large and icon-only.
 3. **Scenes:** a full-screen illustration (farm, street, house, park, beach) with 6–10 hotspots. Each hotspot plays its word and sound and animates. Hotspot coordinates are defined in the content data.
 4. **Counting:** 1–5 identical objects. Tapping each one says "one", "two" and so on. After the last object, the total is spoken again.
 5. **Letters:** one large letter beside an object image ("A — apple"). Tapping either plays both. Letters are drawn with a font, not generated images.
@@ -120,7 +120,7 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 ## 10. Asset specifications
 | Asset | Specification |
 |---|---|
-| Item images | 1024×1024 WebP, about 80–150 KB, single subject, plain or soft background, consistent illustration style |
+| Item images | 1024×1024 WebP, about 80–150 KB, single subject, plain or soft background, consistent illustration style. The converter (`npm run assets`) makes the background transparent by flood-filling the pale area connected to the image edges; pale areas inside the subject are kept. |
 | Scene images | 2048×1536 WebP, about 300–500 KB |
 | Style | One locked style prompt (`STYLE.md`) plus the reference image `design/style/style-reference.png`, applied to every image |
 | Word audio | MP3 or AAC, mono, 64 kbps, under 1.5 s, with silence trimmed |
@@ -152,11 +152,19 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 | # | Deliverable | Done when |
 |---|---|---|
 | M0 | Clickable prototype (5 animal cards) | Tested with both children. Notes captured. |
-| M1 | Basic skeleton: PWA install, offline, home, cards, parent gate, timer, one profile. Content: the 5 style images in `design/style/`, copied into `public/content/img/`, with browser text-to-speech for words until recorded audio exists. | Installs on iPad, works in airplane mode |
+| M1 | Basic skeleton: PWA install, offline, home, cards, parent gate, timer, one profile. Content: the 5 style images in `design/style/`, copied into `public/content/img/`, with browser text-to-speech for words until recorded audio exists. A temporary "Things" home tile (apple) stands in until M3 brings the full module set. | Installs on iPad, works in airplane mode |
 | M2 | Profiles and export/import | Two profiles on one iPad with separate settings |
 | M3 | Scenes, Counting, Letters | All modules render from `content.json` |
 | M4 | Full v1 content | Asset targets in section 9 met, bundle under 50 MB |
 | M5 | Find-it mode, optional parent voice recorder, custom photo cards, usage log | Enabled for the 24-month profile |
+
+## 14a. Decision log
+| Date | Decision |
+|---|---|
+| 2026-10-12 | Cards: the bounce or wiggle starts on tap, alongside the word and sound, rather than after them. |
+| 2026-10-12 | Item image backgrounds are made transparent by the converter (edge-connected flood fill only), not in the source art. |
+| 2026-10-12 | iPhone hit areas are 25% of the short screen edge. |
+| 2026-10-12 | "Things" is a temporary home tile until M3. |
 
 ## 15. Acceptance criteria (v1)
 - Installs to the iPad and iPhone home screens and launches full-screen with no Safari interface.
