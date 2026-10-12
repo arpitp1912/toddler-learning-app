@@ -27,6 +27,7 @@
       "category": "animals",
       "word": "cow",
       "image": "img/animals/cow.webp",
+      "soundAudio": "audio/sounds/cow.m4a",
       "anim": "bounce",
       "tags": [
         "farm"
@@ -47,6 +48,7 @@
       "category": "animals",
       "word": "dog",
       "image": "img/animals/dog.webp",
+      "soundAudio": "audio/sounds/dog.m4a",
       "anim": "bounce",
       "tags": [
         "pets"
@@ -57,6 +59,7 @@
       "category": "animals",
       "word": "cat",
       "image": "img/animals/cat.webp",
+      "soundAudio": "audio/sounds/cat.m4a",
       "anim": "wiggle",
       "tags": [
         "pets"
@@ -67,6 +70,7 @@
       "category": "animals",
       "word": "goat",
       "image": "img/animals/goat.webp",
+      "soundAudio": "audio/sounds/goat.m4a",
       "anim": "bounce",
       "tags": [
         "farm"
@@ -77,6 +81,7 @@
       "category": "animals",
       "word": "sheep",
       "image": "img/animals/sheep.webp",
+      "soundAudio": "audio/sounds/sheep.m4a",
       "anim": "wiggle",
       "tags": [
         "farm"
@@ -87,6 +92,7 @@
       "category": "animals",
       "word": "pig",
       "image": "img/animals/pig.webp",
+      "soundAudio": "audio/sounds/pig.m4a",
       "anim": "bounce",
       "tags": [
         "farm"
@@ -97,6 +103,7 @@
       "category": "animals",
       "word": "horse",
       "image": "img/animals/horse.webp",
+      "soundAudio": "audio/sounds/horse.m4a",
       "anim": "bounce",
       "tags": [
         "farm"

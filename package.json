@@ -7,7 +7,8 @@
     "dev": "vite --host",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host",
-    "assets": "node scripts/convert-images.mjs"
+    "assets": "node scripts/convert-images.mjs",
+    "audio": "node scripts/convert-audio.mjs"
   },
   "dependencies": {
     "dexie": "^4.4.6",
