@@ -1,6 +1,7 @@
 // Converts raw sound effects into the AAC clips the app reads (SPEC section 10):
 // mono, 96 kbps, under 3 s, silence trimmed, normalised to -16 LUFS.
-// Run with `npm run audio`. Uses macOS `afconvert` for decoding and encoding.
+// Run with `npm run audio`. Per-clip start offsets live in content-src/audio/start.json.
+// Uses macOS `afconvert` for decoding and encoding.
 import { execFileSync } from 'node:child_process';
 import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -20,6 +21,9 @@ const FADE_OUT = 0.2 * RATE;
 // Every item with a soundAudio path is built from SRC/<id>.<any extension>.
 const content = JSON.parse(await readFile(`${CONTENT}/content.json`, 'utf8'));
 const sources = await readdir(SRC);
+// Optional seconds to skip at the start of a raw file, keyed by item id, for
+// recordings whose best part isn't at the beginning.
+const starts = JSON.parse(await readFile('content-src/audio/start.json', 'utf8').catch(() => '{}'));
 const tmp = await mkdtemp(path.join(tmpdir(), 'audio-'));
 
 function readFloatWav(buf) {
@@ -90,7 +94,7 @@ for (const { id, soundAudio } of content.items) {
 
   const decoded = path.join(tmp, `${id}-in.wav`);
   execFileSync('afconvert', ['-f', 'WAVE', '-d', `LEF32@${RATE}`, '-c', '1', path.join(SRC, file), decoded]);
-  let x = readFloatWav(await readFile(decoded));
+  let x = readFloatWav(await readFile(decoded)).slice(Math.round((starts[id] ?? 0) * RATE));
 
   // Trim leading and trailing silence.
   const floor = peakOf(x) * 10 ** (SILENCE_DB / 20);
