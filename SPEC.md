@@ -47,7 +47,7 @@ An offline-capable, installable web app for toddlers aged 18–30 months. It rep
 
 ## 6. Child-facing modules (v1)
 1. **Home:** 4–5 giant picture tiles: Animals, Sounds, Places, Counting, Letters. Which tiles appear is set per profile.
-2. **Cards:** one item fills the screen. Tapping the item starts the bounce or wiggle animation immediately and plays the word, then the sound. Tapping the right or left edge, or swiping, moves to the next or previous card. A home button sits in a corner and is large and icon-only.
+2. **Cards:** one item fills the screen. When a card appears it plays the word, then the sound, with the bounce or wiggle starting at the same time, so the child sees the item responds. Tapping the item replays this. Tapping the right or left edge, or swiping, moves to the next or previous card. A home button sits in a corner and is large and icon-only.
 3. **Scenes:** a full-screen illustration (farm, street, house, park, beach) with 6–10 hotspots. Each hotspot plays its word and sound and animates. Hotspot coordinates are defined in the content data.
 4. **Counting:** 1–5 identical objects. Tapping each one says "one", "two" and so on. After the last object, the total is spoken again.
 5. **Letters:** one large letter beside an object image ("A — apple"). Tapping either plays both. Letters are drawn with a font, not generated images.
@@ -165,6 +165,7 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 | 2026-10-12 | Item image backgrounds are made transparent by the converter (edge-connected flood fill only), not in the source art. |
 | 2026-10-12 | iPhone hit areas are 25% of the short screen edge. |
 | 2026-10-12 | "Things" is a temporary home tile until M3. |
+| 2026-10-12 | Cards play word, sound and animation once on arrival (not only on tap), because tap-to-play was not discoverable. This is a single play per card, not an autoplay chain. |
 
 ## 15. Acceptance criteria (v1)
 - Installs to the iPad and iPhone home screens and launches full-screen with no Safari interface.

@@ -6,8 +6,9 @@ import { ChevronIcon } from './icons';
 
 const SWIPE_PX = 60;
 
-// Screen 3. One item fills the screen. Tap it: word, then sound, with a bounce
-// or wiggle. Edge zones or a horizontal swipe move between cards. The bottom
+// Screen 3. One item fills the screen. Each card plays its word, then sound,
+// with a bounce or wiggle as soon as it appears, so the child learns the item
+// responds; tapping it replays. Edge zones or a horizontal swipe move between cards. The bottom
 // corners are left empty as palm rests (see 3b zone map).
 export function Cards({ items, onHome }: { items: Item[]; onHome: () => void }) {
   const [index, setIndex] = useState(0);
@@ -30,9 +31,14 @@ export function Cards({ items, onHome }: { items: Item[]; onHome: () => void }) 
   const go = (dir: 1 | -1) => {
     stopAll();
     setIndex((i) => (i + dir + n) % n);
-    setTaps(0);
     setMoves((m) => m + 1);
   };
+
+  // Play the card once on arrival. Audio was unlocked at "tap to start".
+  useEffect(() => {
+    setTaps(1);
+    void sayItem(item);
+  }, [moves]);
 
   const tapSubject = () => {
     setTaps((t) => t + 1);
