@@ -38,6 +38,7 @@
       "category": "animals",
       "word": "duck",
       "image": "img/animals/duck.webp",
+      "soundAudio": "audio/sounds/duck.m4a",
       "anim": "wiggle",
       "tags": [
         "farm"
@@ -114,6 +115,7 @@
       "category": "animals",
       "word": "hen",
       "image": "img/animals/hen.webp",
+      "soundAudio": "audio/sounds/hen.m4a",
       "anim": "wiggle",
       "tags": [
         "farm",
@@ -145,6 +147,7 @@
       "category": "animals",
       "word": "monkey",
       "image": "img/animals/monkey.webp",
+      "soundAudio": "audio/sounds/monkey.m4a",
       "anim": "bounce",
       "tags": [
         "wild"
@@ -155,6 +158,7 @@
       "category": "animals",
       "word": "elephant",
       "image": "img/animals/elephant.webp",
+      "soundAudio": "audio/sounds/elephant.m4a",
       "anim": "bounce",
       "tags": [
         "wild"
