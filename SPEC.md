@@ -120,7 +120,7 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 ## 10. Asset specifications
 | Asset | Specification |
 |---|---|
-| Item images | 1024×1024 WebP, about 80–150 KB, single subject, plain or soft background, consistent illustration style. The converter (`npm run assets`) makes the background transparent by flood-filling the pale area connected to the image edges; pale areas inside the subject are kept. |
+| Item images | 1024×1024 WebP, about 80–150 KB, single subject, plain or soft background, consistent illustration style. The converter (`npm run assets`) makes the background transparent by flood-filling the pale area connected to the image edges; pale areas inside the subject are kept, even behind a small gap in the outline. Small pale pockets between legs or feet are removed. The converter builds every item listed in `content.json` from `design/style/<id>.png`. |
 | Scene images | 2048×1536 WebP, about 300–500 KB |
 | Style | One locked style prompt (`STYLE.md`) plus the reference image `design/style/style-reference.png`, applied to every image |
 | Word audio | MP3 or AAC, mono, 64 kbps, under 1.5 s, with silence trimmed |

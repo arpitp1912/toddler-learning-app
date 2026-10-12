@@ -43,6 +43,157 @@
       ]
     },
     {
+      "id": "dog",
+      "category": "animals",
+      "word": "dog",
+      "image": "img/animals/dog.webp",
+      "anim": "bounce",
+      "tags": [
+        "pets"
+      ]
+    },
+    {
+      "id": "cat",
+      "category": "animals",
+      "word": "cat",
+      "image": "img/animals/cat.webp",
+      "anim": "wiggle",
+      "tags": [
+        "pets"
+      ]
+    },
+    {
+      "id": "goat",
+      "category": "animals",
+      "word": "goat",
+      "image": "img/animals/goat.webp",
+      "anim": "bounce",
+      "tags": [
+        "farm"
+      ]
+    },
+    {
+      "id": "sheep",
+      "category": "animals",
+      "word": "sheep",
+      "image": "img/animals/sheep.webp",
+      "anim": "wiggle",
+      "tags": [
+        "farm"
+      ]
+    },
+    {
+      "id": "pig",
+      "category": "animals",
+      "word": "pig",
+      "image": "img/animals/pig.webp",
+      "anim": "bounce",
+      "tags": [
+        "farm"
+      ]
+    },
+    {
+      "id": "horse",
+      "category": "animals",
+      "word": "horse",
+      "image": "img/animals/horse.webp",
+      "anim": "bounce",
+      "tags": [
+        "farm"
+      ]
+    },
+    {
+      "id": "hen",
+      "category": "animals",
+      "word": "hen",
+      "image": "img/animals/hen.webp",
+      "anim": "wiggle",
+      "tags": [
+        "farm",
+        "birds"
+      ]
+    },
+    {
+      "id": "crow",
+      "category": "animals",
+      "word": "crow",
+      "image": "img/animals/crow.webp",
+      "anim": "wiggle",
+      "tags": [
+        "birds"
+      ]
+    },
+    {
+      "id": "parrot",
+      "category": "animals",
+      "word": "parrot",
+      "image": "img/animals/parrot.webp",
+      "anim": "wiggle",
+      "tags": [
+        "birds"
+      ]
+    },
+    {
+      "id": "monkey",
+      "category": "animals",
+      "word": "monkey",
+      "image": "img/animals/monkey.webp",
+      "anim": "bounce",
+      "tags": [
+        "wild"
+      ]
+    },
+    {
+      "id": "elephant",
+      "category": "animals",
+      "word": "elephant",
+      "image": "img/animals/elephant.webp",
+      "anim": "bounce",
+      "tags": [
+        "wild"
+      ]
+    },
+    {
+      "id": "lion",
+      "category": "animals",
+      "word": "lion",
+      "image": "img/animals/lion.webp",
+      "anim": "bounce",
+      "tags": [
+        "wild"
+      ]
+    },
+    {
+      "id": "frog",
+      "category": "animals",
+      "word": "frog",
+      "image": "img/animals/frog.webp",
+      "anim": "bounce",
+      "tags": [
+        "pond"
+      ]
+    },
+    {
+      "id": "fish",
+      "category": "animals",
+      "word": "fish",
+      "image": "img/animals/fish.webp",
+      "anim": "wiggle",
+      "tags": [
+        "pond"
+      ]
+    },
+    {
+      "id": "bee",
+      "category": "animals",
+      "word": "bee",
+      "image": "img/animals/bee.webp",
+      "anim": "wiggle",
+      "tags": [
+        "garden"
+      ]
+    },
+    {
       "id": "car",
       "category": "sounds",
       "word": "car",
