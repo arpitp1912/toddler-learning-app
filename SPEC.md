@@ -152,7 +152,7 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 | # | Deliverable | Done when |
 |---|---|---|
 | M0 | Clickable prototype (5 animal cards) | Tested with both children. Notes captured. |
-| M1 | Basic skeleton: PWA install, offline, home, cards, parent gate, timer, one profile. Content: the 5 style images in `design/style/`, copied into `public/content/img/`, with browser text-to-speech for words until recorded audio exists. A temporary "Things" home tile (apple) stands in until M3 brings the full module set. | Installs on iPad, works in airplane mode |
+| M1 | Basic skeleton: PWA install, offline, home, cards, parent gate, timer, one profile. Content: the 5 style images in `design/style/`, copied into `public/content/img/`, with browser text-to-speech for words until recorded audio exists. A "Things" home tile (apple) stood in until M3; it later became a permanent tile alongside Food (see decision log). | Installs on iPad, works in airplane mode |
 | M2 | Profiles and export/import | Two profiles on one iPad with separate settings |
 | M3 | Scenes, Counting, Letters | All modules render from `content.json` |
 | M4 | Full v1 content | Asset targets in section 9 met, bundle under 50 MB |
@@ -166,6 +166,7 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 | 2026-10-12 | iPhone hit areas are 25% of the short screen edge. |
 | 2026-10-12 | "Things" is a temporary home tile until M3. |
 | 2026-10-12 | Cards play word, sound and animation once on arrival (not only on tap), because tap-to-play was not discoverable. This is a single play per card, not an autoplay chain. |
+| 2026-10-13 | Food and Things are separate, permanent card tiles (food items in Food, everyday objects in Things), replacing the temporary Things tile. This brings forward part of the food pack listed in section 12. With M3 the home would reach 7 tiles, above the 4–5 in section 6, so the tile set must be decided before M3. |
 
 ## 15. Acceptance criteria (v1)
 - Installs to the iPad and iPhone home screens and launches full-screen with no Safari interface.

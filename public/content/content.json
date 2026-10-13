@@ -17,8 +17,14 @@
     {
       "id": "things",
       "module": "cards",
-      "icon": "img/things/apple.webp",
+      "icon": "img/things/teddybear.webp",
       "tint": "butter"
+    },
+    {
+      "id": "food",
+      "module": "cards",
+      "icon": "img/food/apple.webp",
+      "tint": "peach"
     }
   ],
   "items": [
@@ -223,9 +229,9 @@
     },
     {
       "id": "apple",
-      "category": "things",
+      "category": "food",
       "word": "apple",
-      "image": "img/things/apple.webp",
+      "image": "img/food/apple.webp",
       "anim": "bounce",
       "tags": [
         "food"
@@ -233,9 +239,9 @@
     },
     {
       "id": "banana",
-      "category": "things",
+      "category": "food",
       "word": "banana",
-      "image": "img/things/banana.webp",
+      "image": "img/food/banana.webp",
       "anim": "wiggle",
       "tags": [
         "fruit"
@@ -243,9 +249,9 @@
     },
     {
       "id": "lemon",
-      "category": "things",
+      "category": "food",
       "word": "lemon",
-      "image": "img/things/lemon.webp",
+      "image": "img/food/lemon.webp",
       "anim": "bounce",
       "tags": [
         "fruit"
@@ -253,9 +259,9 @@
     },
     {
       "id": "watermelon",
-      "category": "things",
+      "category": "food",
       "word": "watermelon",
-      "image": "img/things/watermelon.webp",
+      "image": "img/food/watermelon.webp",
       "anim": "wiggle",
       "tags": [
         "fruit"
@@ -263,9 +269,9 @@
     },
     {
       "id": "pomegranate",
-      "category": "things",
+      "category": "food",
       "word": "pomegranate",
-      "image": "img/things/pomegranate.webp",
+      "image": "img/food/pomegranate.webp",
       "anim": "bounce",
       "tags": [
         "fruit"
@@ -273,9 +279,9 @@
     },
     {
       "id": "orange",
-      "category": "things",
+      "category": "food",
       "word": "orange",
-      "image": "img/things/orange.webp",
+      "image": "img/food/orange.webp",
       "anim": "wiggle",
       "tags": [
         "fruit"
@@ -283,9 +289,9 @@
     },
     {
       "id": "papaya",
-      "category": "things",
+      "category": "food",
       "word": "papaya",
-      "image": "img/things/papaya.webp",
+      "image": "img/food/papaya.webp",
       "anim": "bounce",
       "tags": [
         "fruit"
@@ -293,9 +299,9 @@
     },
     {
       "id": "mango",
-      "category": "things",
+      "category": "food",
       "word": "mango",
-      "image": "img/things/mango.webp",
+      "image": "img/food/mango.webp",
       "anim": "wiggle",
       "tags": [
         "fruit"
@@ -303,9 +309,9 @@
     },
     {
       "id": "icecream",
-      "category": "things",
+      "category": "food",
       "word": "ice cream",
-      "image": "img/things/icecream.webp",
+      "image": "img/food/icecream.webp",
       "anim": "bounce",
       "tags": [
         "food"
@@ -313,9 +319,9 @@
     },
     {
       "id": "guava",
-      "category": "things",
+      "category": "food",
       "word": "guava",
-      "image": "img/things/guava.webp",
+      "image": "img/food/guava.webp",
       "anim": "wiggle",
       "tags": [
         "fruit"
@@ -323,9 +329,9 @@
     },
     {
       "id": "grapes",
-      "category": "things",
+      "category": "food",
       "word": "grapes",
-      "image": "img/things/grapes.webp",
+      "image": "img/food/grapes.webp",
       "anim": "bounce",
       "tags": [
         "fruit"
@@ -333,9 +339,9 @@
     },
     {
       "id": "coconut",
-      "category": "things",
+      "category": "food",
       "word": "coconut",
-      "image": "img/things/coconut.webp",
+      "image": "img/food/coconut.webp",
       "anim": "wiggle",
       "tags": [
         "fruit"
