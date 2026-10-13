@@ -11,7 +11,10 @@ const SRC = 'content-src/audio/raw';
 const CONTENT = 'public/content';
 const RATE = 48000;
 const TARGET_LUFS = -16;
-const MAX_PEAK_DB = -1;     // never boost past this, even if short of the target
+const MAX_PEAK_DB = -1;     // peak ceiling after normalising
+const MAX_LIMIT_DB = 9;     // most gain reduction the limiter may apply to short peaks
+const LOOKAHEAD = 0.005 * RATE;
+const RELEASE = 0.08 * RATE;
 const MAX_SECONDS = 2.9;    // under 3 s, leaving room for AAC encoder padding
 const SILENCE_DB = -40;     // relative to the clip's peak
 const PAD = 0.02 * RATE;    // keep 20 ms either side of the sound
@@ -87,6 +90,30 @@ function loudness(x) {
 const peakOf = (x) => x.reduce((m, s) => Math.max(m, Math.abs(s)), 0);
 const db = (v) => 20 * Math.log10(v);
 
+// Lookahead peak limiter holding samples at or below MAX_PEAK_DB. The gain each
+// sample needs is min-held over the lookahead window, then box-averaged over the
+// same window, which never exceeds the need at any sample; a slow release then
+// lets it recover without pumping.
+function limit(x) {
+  const ceiling = 10 ** (MAX_PEAK_DB / 20);
+  const need = x.map((s) => Math.min(1, ceiling / Math.max(Math.abs(s), 1e-9)));
+  const held = new Float32Array(x.length);
+  for (let i = 0; i < x.length; i++) {
+    let m = 1;
+    for (let j = i; j < Math.min(i + LOOKAHEAD, x.length); j++) m = Math.min(m, need[j]);
+    held[i] = m;
+  }
+  const out = new Float32Array(x.length);
+  const recover = 1 - Math.exp(-1 / RELEASE);
+  let sum = LOOKAHEAD, env = 1; // the window starts full of unity gain
+  for (let i = 0; i < x.length; i++) {
+    sum += held[i] - (i >= LOOKAHEAD ? held[i - LOOKAHEAD] : 1);
+    env = Math.min(sum / LOOKAHEAD, env + (1 - env) * recover);
+    out[i] = x[i] * Math.min(env, need[i]);
+  }
+  return out;
+}
+
 for (const { id, soundAudio } of content.items) {
   if (!soundAudio) continue;
   const file = sources.find((f) => path.parse(f).name === id);
@@ -109,13 +136,24 @@ for (const { id, soundAudio } of content.items) {
   for (let i = 0; i < FADE_IN && i < x.length; i++) x[i] *= i / FADE_IN;
   if (trimmed) for (let i = 0; i < FADE_OUT; i++) x[x.length - 1 - i] *= i / FADE_OUT;
 
-  // Normalise loudness, holding the peak below MAX_PEAK_DB.
-  const before = loudness(x);
-  let gain = 10 ** ((TARGET_LUFS - before) / 20);
-  const peakLimit = 10 ** (MAX_PEAK_DB / 20) / peakOf(x);
-  const limited = gain > peakLimit;
-  if (limited) gain = peakLimit;
-  x = x.map((s) => s * gain);
+  // Normalise loudness. Short peaks that would pass MAX_PEAK_DB are turned down
+  // by the limiter, so a few spikes don't hold the whole clip below target.
+  const raw = x;
+  let gain = 10 ** ((TARGET_LUFS - loudness(raw)) / 20);
+  let limited = false;
+  for (let pass = 0; pass < 6; pass++) {
+    x = raw.map((s) => s * gain);
+    if (db(peakOf(x)) <= MAX_PEAK_DB) break;
+    limited = true;
+    x = limit(x);
+    const miss = TARGET_LUFS - loudness(x);
+    if (Math.abs(miss) < 0.1) break;
+    gain *= 10 ** (miss / 20);
+  }
+  if (limited && db(peakOf(raw)) + db(gain) - MAX_PEAK_DB > MAX_LIMIT_DB) {
+    // Too much limiting would squash the sound; fall back to peak-normalising.
+    x = raw.map((s) => s * 10 ** (MAX_PEAK_DB / 20) / peakOf(raw));
+  }
 
   const processed = path.join(tmp, `${id}.wav`);
   await writeFile(processed, writeFloatWav(x));
@@ -124,7 +162,7 @@ for (const { id, soundAudio } of content.items) {
   execFileSync('afconvert', ['-f', 'm4af', '-d', 'aac', '-b', '96000', '-c', '1', processed, dest]);
 
   const size = (await readFile(dest)).length;
-  const notes = [trimmed && 'cut to fit', limited && `peak-limited, ${loudness(x).toFixed(1)} LUFS`].filter(Boolean);
+  const notes = [trimmed && 'cut to fit', limited && `limited, ${loudness(x).toFixed(1)} LUFS`].filter(Boolean);
   console.log(`${dest}  ${(x.length / RATE).toFixed(2)} s  ${(size / 1024).toFixed(0)} KB  peak ${db(peakOf(x)).toFixed(1)} dB${notes.length ? `  (${notes.join('; ')})` : ''}`);
 }
 

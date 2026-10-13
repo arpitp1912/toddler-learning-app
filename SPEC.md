@@ -124,7 +124,7 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 | Scene images | 2048×1536 WebP, about 300–500 KB |
 | Style | One locked style prompt (`STYLE.md`) plus the reference image `design/style/style-reference.png`, applied to every image |
 | Word audio | MP3 or AAC, mono, 64 kbps, under 1.5 s, with silence trimmed |
-| Sound audio | MP3 or AAC, mono, 96 kbps, under 3 s, normalised to −16 LUFS. The converter (`npm run audio`, macOS only, uses `afconvert`) builds every item with a `soundAudio` path from `content-src/audio/raw/<id>.*`, skipping any start offset set in `content-src/audio/start.json`: it trims silence, cuts clips that are too long with a fade-out, and normalises loudness without letting peaks exceed −1 dBFS. Output is AAC in `.m4a`. |
+| Sound audio | MP3 or AAC, mono, 96 kbps, under 3 s, normalised to −16 LUFS. The converter (`npm run audio`, macOS only, uses `afconvert`) builds every item with a `soundAudio` path from `content-src/audio/raw/<id>.*`, skipping any start offset set in `content-src/audio/start.json`: it trims silence, cuts clips that are too long with a fade-out, and normalises loudness, with a limiter holding short peaks at −1 dBFS (up to 9 dB of reduction; beyond that it peak-normalises instead). Output is AAC in `.m4a`. |
 | Sources | Images from Gemini (fallback: ChatGPT). Sounds from Freesound, CC0 licence only, with the source recorded in `CREDITS.md`. |
 | Total offline bundle | Under 50 MB |
 
