@@ -224,6 +224,116 @@
       "tags": [
         "food"
       ]
+    },
+    {
+      "id": "banana",
+      "category": "things",
+      "word": "banana",
+      "image": "img/things/banana.webp",
+      "anim": "wiggle",
+      "tags": [
+        "fruit"
+      ]
+    },
+    {
+      "id": "lemon",
+      "category": "things",
+      "word": "lemon",
+      "image": "img/things/lemon.webp",
+      "anim": "bounce",
+      "tags": [
+        "fruit"
+      ]
+    },
+    {
+      "id": "watermelon",
+      "category": "things",
+      "word": "watermelon",
+      "image": "img/things/watermelon.webp",
+      "anim": "wiggle",
+      "tags": [
+        "fruit"
+      ]
+    },
+    {
+      "id": "pomegranate",
+      "category": "things",
+      "word": "pomegranate",
+      "image": "img/things/pomegranate.webp",
+      "anim": "bounce",
+      "tags": [
+        "fruit"
+      ]
+    },
+    {
+      "id": "orange",
+      "category": "things",
+      "word": "orange",
+      "image": "img/things/orange.webp",
+      "anim": "wiggle",
+      "tags": [
+        "fruit"
+      ]
+    },
+    {
+      "id": "papaya",
+      "category": "things",
+      "word": "papaya",
+      "image": "img/things/papaya.webp",
+      "anim": "bounce",
+      "tags": [
+        "fruit"
+      ]
+    },
+    {
+      "id": "mango",
+      "category": "things",
+      "word": "mango",
+      "image": "img/things/mango.webp",
+      "anim": "wiggle",
+      "tags": [
+        "fruit"
+      ]
+    },
+    {
+      "id": "icecream",
+      "category": "things",
+      "word": "ice cream",
+      "image": "img/things/icecream.webp",
+      "anim": "bounce",
+      "tags": [
+        "food"
+      ]
+    },
+    {
+      "id": "guava",
+      "category": "things",
+      "word": "guava",
+      "image": "img/things/guava.webp",
+      "anim": "wiggle",
+      "tags": [
+        "fruit"
+      ]
+    },
+    {
+      "id": "grapes",
+      "category": "things",
+      "word": "grapes",
+      "image": "img/things/grapes.webp",
+      "anim": "bounce",
+      "tags": [
+        "fruit"
+      ]
+    },
+    {
+      "id": "coconut",
+      "category": "things",
+      "word": "coconut",
+      "image": "img/things/coconut.webp",
+      "anim": "wiggle",
+      "tags": [
+        "fruit"
+      ]
     }
   ],
   "decor": {
