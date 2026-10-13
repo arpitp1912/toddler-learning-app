@@ -20,6 +20,7 @@ const KEY_CORE = 22;   // colour distance treated as background
 const KEY_FEATHER = 44; // distance at which the feather band becomes opaque
 const KEY_GAP = 3;     // outline gaps up to 2 * KEY_GAP px wide don't leak
 const KEY_POCKET = 6000; // leftover pale pockets smaller than this (px) are background
+const KEY_HOLE = 6;      // enclosed pale areas averaging this close to the background are holes
 
 // Binary erode (all ones in the box) or dilate (any one) with a square box of
 // radius r, as two 1-D sliding-window passes. Off-image pixels count as pale
@@ -99,6 +100,26 @@ async function keyBackground(src) {
       }
     }
     if (tail < KEY_POCKET) for (let i = 0; i < tail; i++) alpha[queue[i]] = 0;
+  }
+
+  // Holes fully enclosed by the subject (inside a cup or jug handle) show the
+  // flat background colour. Pale parts of the subject itself (a clock face, a
+  // white chest) sit further from it, around 10-17, so they stay.
+  for (let s = 0; s < w * h; s++) {
+    if (seen[s] || !pale[s] || alpha[s] === 0) continue;
+    head = 0; tail = 0;
+    seen[s] = 1; queue[tail++] = s;
+    let sum = 0;
+    while (head < tail) {
+      const p = queue[head++];
+      sum += dist(p);
+      const x = p % w;
+      for (const q of [x > 0 ? p - 1 : -1, x < w - 1 ? p + 1 : -1, p - w, p + w]) {
+        if (q < 0 || q >= w * h || seen[q] || !pale[q] || alpha[q] === 0) continue;
+        seen[q] = 1; queue[tail++] = q;
+      }
+    }
+    if (sum / tail <= KEY_HOLE) for (let i = 0; i < tail; i++) alpha[queue[i]] = 0;
   }
 
   // Feather: opaque pixels touching the removed area fade by colour distance.

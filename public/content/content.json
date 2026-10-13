@@ -169,6 +169,7 @@
       "category": "animals",
       "word": "lion",
       "image": "img/animals/lion.webp",
+      "soundAudio": "audio/sounds/lion.m4a",
       "anim": "bounce",
       "tags": [
         "wild"
@@ -333,6 +334,166 @@
       "anim": "wiggle",
       "tags": [
         "fruit"
+      ]
+    },
+    {
+      "id": "ball",
+      "category": "things",
+      "word": "ball",
+      "image": "img/things/ball.webp",
+      "anim": "wiggle",
+      "tags": [
+        "toys"
+      ]
+    },
+    {
+      "id": "book",
+      "category": "things",
+      "word": "book",
+      "image": "img/things/book.webp",
+      "anim": "bounce",
+      "tags": [
+        "home"
+      ]
+    },
+    {
+      "id": "bottle",
+      "category": "things",
+      "word": "bottle",
+      "image": "img/things/bottle.webp",
+      "anim": "wiggle",
+      "tags": [
+        "home"
+      ]
+    },
+    {
+      "id": "chair",
+      "category": "things",
+      "word": "chair",
+      "image": "img/things/chair.webp",
+      "anim": "bounce",
+      "tags": [
+        "home"
+      ]
+    },
+    {
+      "id": "clock",
+      "category": "things",
+      "word": "clock",
+      "image": "img/things/clock.webp",
+      "anim": "wiggle",
+      "tags": [
+        "home"
+      ]
+    },
+    {
+      "id": "cup",
+      "category": "things",
+      "word": "cup",
+      "image": "img/things/cup.webp",
+      "anim": "bounce",
+      "tags": [
+        "home"
+      ]
+    },
+    {
+      "id": "door",
+      "category": "things",
+      "word": "door",
+      "image": "img/things/door.webp",
+      "anim": "wiggle",
+      "tags": [
+        "home"
+      ]
+    },
+    {
+      "id": "hat",
+      "category": "things",
+      "word": "hat",
+      "image": "img/things/hat.webp",
+      "anim": "bounce",
+      "tags": [
+        "home"
+      ]
+    },
+    {
+      "id": "jug",
+      "category": "things",
+      "word": "jug",
+      "image": "img/things/jug.webp",
+      "anim": "wiggle",
+      "tags": [
+        "home"
+      ]
+    },
+    {
+      "id": "key",
+      "category": "things",
+      "word": "key",
+      "image": "img/things/key.webp",
+      "anim": "bounce",
+      "tags": [
+        "home"
+      ]
+    },
+    {
+      "id": "phone",
+      "category": "things",
+      "word": "phone",
+      "image": "img/things/phone.webp",
+      "anim": "wiggle",
+      "tags": [
+        "home"
+      ]
+    },
+    {
+      "id": "shoe",
+      "category": "things",
+      "word": "shoe",
+      "image": "img/things/shoe.webp",
+      "anim": "bounce",
+      "tags": [
+        "home"
+      ]
+    },
+    {
+      "id": "spoon",
+      "category": "things",
+      "word": "spoon",
+      "image": "img/things/spoon.webp",
+      "anim": "wiggle",
+      "tags": [
+        "home"
+      ]
+    },
+    {
+      "id": "teddybear",
+      "category": "things",
+      "word": "teddy bear",
+      "image": "img/things/teddybear.webp",
+      "anim": "bounce",
+      "tags": [
+        "toys"
+      ]
+    },
+    {
+      "id": "toothbrush",
+      "category": "things",
+      "word": "toothbrush",
+      "image": "img/things/toothbrush.webp",
+      "anim": "wiggle",
+      "tags": [
+        "home"
+      ]
+    },
+    {
+      "id": "umbrella",
+      "category": "things",
+      "word": "umbrella",
+      "image": "img/things/umbrella.webp",
+      "anim": "bounce",
+      "tags": [
+        "home"
       ]
     }
   ],
