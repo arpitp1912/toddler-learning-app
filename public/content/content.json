@@ -127,6 +127,7 @@
       "category": "animals",
       "word": "crow",
       "image": "img/animals/crow.webp",
+      "soundAudio": "audio/sounds/crow.m4a",
       "anim": "wiggle",
       "tags": [
         "birds"
@@ -137,6 +138,7 @@
       "category": "animals",
       "word": "parrot",
       "image": "img/animals/parrot.webp",
+      "soundAudio": "audio/sounds/parrot.m4a",
       "anim": "wiggle",
       "tags": [
         "birds"
@@ -180,6 +182,7 @@
       "category": "animals",
       "word": "frog",
       "image": "img/animals/frog.webp",
+      "soundAudio": "audio/sounds/frog.m4a",
       "anim": "bounce",
       "tags": [
         "pond"
@@ -190,6 +193,7 @@
       "category": "animals",
       "word": "fish",
       "image": "img/animals/fish.webp",
+      "soundAudio": "audio/sounds/fish.m4a",
       "anim": "wiggle",
       "tags": [
         "pond"
@@ -200,6 +204,7 @@
       "category": "animals",
       "word": "bee",
       "image": "img/animals/bee.webp",
+      "soundAudio": "audio/sounds/bee.m4a",
       "anim": "wiggle",
       "tags": [
         "garden"
