@@ -8,13 +8,15 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host",
     "assets": "node scripts/convert-images.mjs",
-    "audio": "node scripts/convert-audio.mjs"
+    "audio": "node scripts/convert-audio.mjs",
+    "test": "playwright test"
   },
   "dependencies": {
     "dexie": "^4.4.6",
     "preact": "^11.0.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@preact/preset-vite": "^2.10.6",
     "sharp": "^0.35.5",
     "typescript": "^7.0.2",

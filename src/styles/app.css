@@ -315,6 +315,88 @@ button {
   .tile:active, .play:active { transform: none; opacity: .8; }
 }
 
+/* ---------- Peekaboo ---------- */
+/* Same stage and edge zones as the card; the cover sits exactly over the item. */
+.cover {
+  position: absolute;
+  width: calc(560 * var(--u));
+  height: calc(560 * var(--u));
+  z-index: 2;
+}
+.cover-body { position: absolute; inset: 0; display: block; transform-origin: 50% 90%; }
+.cover.is-covered .cover-body { animation: coverIdle var(--t-idle) ease-in-out infinite; }
+.cover:not(.is-covered) { pointer-events: none; }
+.cover.cover--pop { animation: enterA var(--t-enter) ease-out; }
+.cover-part { position: absolute; display: block; }
+.cover-part svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.cover-part--left { left: 0; top: 0; width: 60%; height: 100%; transform-origin: 0 100%; }
+.cover-part--right { right: 0; top: 0; width: 60%; height: 100%; transform-origin: 100% 100%; }
+.cover-part--door { inset: 0; transform-origin: 0 50%; }
+.cover-part--cloud { inset: 0; }
+.cover-part--blanket { inset: 0; transform-origin: 100% 0; }
+
+/* Opening; closing plays the same motion in reverse. */
+.cover.is-opening .cover-part--left { animation: bushLeft var(--t-open) ease-in forwards; }
+.cover.is-opening .cover-part--right { animation: bushRight var(--t-open) ease-in forwards; }
+.cover.is-opening .cover-part--door { animation: doorOpen var(--t-open) ease-in forwards; }
+.cover.is-opening .cover-part--cloud { animation: cloudUp var(--t-open) ease-in forwards; }
+.cover.is-opening .cover-part--blanket { animation: blanketLift var(--t-open) ease-in forwards; }
+.cover.is-closing .cover-part--left { animation: bushLeft var(--t-close) ease-out reverse both; }
+.cover.is-closing .cover-part--right { animation: bushRight var(--t-close) ease-out reverse both; }
+.cover.is-closing .cover-part--door { animation: doorOpen var(--t-close) ease-out reverse both; }
+.cover.is-closing .cover-part--cloud { animation: cloudUp var(--t-close) ease-out reverse both; }
+.cover.is-closing .cover-part--blanket { animation: blanketLift var(--t-close) ease-out reverse both; }
+
+@keyframes coverIdle {
+  0%, 20%, 100% { transform: rotate(0); }
+  5% { transform: rotate(-2.5deg); }
+  10% { transform: rotate(2.5deg); }
+  15% { transform: rotate(-1.2deg); }
+}
+@keyframes bushLeft {
+  0% { transform: none; opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translateX(-80%) rotate(-12deg); opacity: 0; }
+}
+@keyframes bushRight {
+  0% { transform: none; opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translateX(80%) rotate(12deg); opacity: 0; }
+}
+@keyframes doorOpen {
+  0% { transform: perspective(1400px) rotateY(0); opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: perspective(1400px) rotateY(-105deg); opacity: 0; }
+}
+@keyframes cloudUp {
+  0% { transform: none; opacity: 1; }
+  60% { opacity: 1; }
+  100% { transform: translateY(-115%) scale(.9); opacity: 0; }
+}
+@keyframes blanketLift {
+  0% { transform: perspective(1200px); opacity: 1; }
+  40% { transform: perspective(1200px) rotateX(-30deg) rotateY(-30deg) rotate(-4deg); opacity: 1; }
+  100% { transform: perspective(1200px) translate(45%, -80%) rotateX(-50deg) rotateY(-50deg) rotate(14deg); opacity: 0; }
+}
+@keyframes coverFade { 0% { opacity: 1; } 100% { opacity: 0; } }
+
+@media (orientation: portrait) {
+  .cover { width: calc(340 * var(--u)); height: calc(340 * var(--u)); }
+}
+
+/* Reduced motion: no wiggle; the cover cross-fades instead of moving. */
+@media (prefers-reduced-motion: reduce) {
+  .cover-body, .cover .cover-part, .cover.cover--pop { animation: none !important; }
+  .cover.is-opening { animation: coverFade 300ms ease forwards; }
+  .cover.is-closing { animation: coverFade 300ms ease reverse both; }
+}
+
+/* Home tile icon drawn in SVG rather than an image. */
+.tile .icon--tile { width: calc(290 * var(--u)); height: calc(290 * var(--u)); }
+@media (orientation: portrait) {
+  .tile .icon--tile { width: calc(170 * var(--u)); height: calc(170 * var(--u)); }
+}
+
 /* ---------- 8a · One minute left (fading sun) ---------- */
 .dusk {
   position: absolute;

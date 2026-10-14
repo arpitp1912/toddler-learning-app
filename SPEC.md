@@ -36,7 +36,7 @@ An offline-capable, installable web app for toddlers aged 18–30 months. It rep
 
 | Item | Behaviour |
 |---|---|
-| Profile fields | id, display name (parent-only), avatar photo (from camera or library) or preset animal avatar, age band, enabled modules, session limit (minutes), assigned voice packs and voice mode, created date |
+| Profile fields | id, display name (parent-only), avatar photo (from camera or library) or preset animal avatar, age band, enabled modules (home tile ids: category ids plus `peekaboo`), session limit (minutes), Peekaboo sound hint, assigned voice packs and voice mode, created date |
 | Multiple profiles | Unlimited profiles per device, for example Grandma's iPad holding both children. |
 | Launch | Opens directly into the last-used profile. The child never sees a picker by default. |
 | Switching | Done from the parent area. An optional toddler-facing picker (large avatar faces) can be turned on. |
@@ -52,6 +52,11 @@ An offline-capable, installable web app for toddlers aged 18–30 months. It rep
 4. **Counting:** 1–5 identical objects. Tapping each one says "one", "two" and so on. After the last object, the total is spoken again.
 5. **Letters:** one large letter beside an object image ("A — apple"). Tapping either plays both. Letters are drawn with a font, not generated images.
 6. **Find it (profile setting, off by default; suggested for age 24 months and over):** 2–3 items shown, a prompt says "Where's the cow?". Tapping the correct item celebrates it. Tapping a wrong item names that item and re-prompts. No failure state.
+7. **Peekaboo:** one large cover (at least 60% of the short edge) hides an item. While waiting, the cover gives a gentle wiggle every 3 s (static under reduced motion). Tapping it opens the cover (500 ms or less) and reveals the item, which plays "peekaboo", the word, then the item's sound (as on a card: twice with a short gap), then bounces. Tapping the revealed item replays the word and sound. Edge taps or a swipe, as on Cards, close a new cover over the next item; there is no auto-advance. Taps on the cover while it is opening are ignored, so audio never plays twice.
+   - **Covers:** bush (parts left and right), door (swings open), cloud (drifts up), blanket (lifts from one corner). They are drawn in inline SVG with the design tokens, no image files, and rotate in that order each round. Under reduced motion the cover cross-fades instead.
+   - **Items:** drawn at random from the item categories enabled for the profile, with no repeats until every item has been shown. Item images only, never scene images. Item audio and fallbacks as on Cards.
+   - **Sound hint (profile setting, off by default):** when on, the hidden item's sound plays once at 40% volume as each new cover appears. The default comes from `defaults.peekabooSoundHint` in `content.json`; a profile value overrides it.
+   - **Home tile:** a bush with two eyes peeking, drawn in SVG. It shows when the profile's enabled modules allow `peekaboo` (all tiles are on when no list is set).
 
 ## 7. Session control
 - Each profile has a limit of 5, 10, 15 or 20 minutes, or off.
@@ -62,7 +67,7 @@ An offline-capable, installable web app for toddlers aged 18–30 months. It rep
 - Manage profiles: create, edit, delete, export and import.
 - **Voice packs (optional, M5):** see section 8a.
 - Custom photo cards: take a photo, record a word, choose a category. Stored per profile.
-- Settings: modules on or off, session limit, Find-it mode, toddler-facing profile picker, PIN.
+- Settings: modules on or off (including the Peekaboo tile), session limit, Find-it mode, Peekaboo sound hint, toddler-facing profile picker, PIN.
 - Usage log: sessions per day, minutes, most-tapped items. Local only.
 - Setup help: how to install to the home screen and how to enable Guided Access.
 
@@ -76,7 +81,9 @@ A voice pack is a named set of recordings by one adult, such as "Papa", "Mumma" 
 - **Import:** parent area → Voices → Import, then assign the pack to one or more profiles. Re-importing a newer version of the same pack merges it, and the newer recordings win.
 - **Assigning voices to a profile:** an ordered list of packs. Voice mode is either *primary* (always use the first pack that has the word) or *rotate* (pick at random from the packs that have the word).
 - **Fallback:** the built-in default voice plays for any word that no assigned pack has recorded.
-- **Find-it prompt:** "Where's the…" is recorded once per pack and joined to the item word. If missing, the default voice says the prompt.
+- **Prompts:** recorded once per pack, alongside the item words. If a pack has no recording, the default voice says the prompt.
+  - "Where's the…" (Find it): joined to the item word.
+  - "Peekaboo" (Peekaboo): said as the cover opens, before the item word.
 - **Microphone:** iOS asks for microphone permission on first use. Show a short explanation screen before the prompt appears.
 
 ## 9. Content model
@@ -85,6 +92,7 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 ```json
 {
   "version": 1,
+  "defaults": { "peekabooSoundHint": false },
   "categories": [
     { "id": "animals", "icon": "img/cat/animals.webp" }
   ],
@@ -114,6 +122,7 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 ```
 - Hotspot x, y and r are fractions of the image's width and height, so they scale across devices.
 - `word` is used as the text-to-speech fallback if `wordAudio` is missing.
+- `defaults` holds profile settings used until a profile sets its own (currently `peekabooSoundHint`).
 
 **v1 content target:** 40 animals, 20 everyday sounds (vehicles, household, nature), 5 scenes, counting objects for 1–5, 26 letter–object pairs. Letter objects reuse items wherever possible.
 
@@ -167,6 +176,8 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 | 2026-10-12 | "Things" is a temporary home tile until M3. |
 | 2026-10-12 | Cards play word, sound and animation once on arrival (not only on tap), because tap-to-play was not discoverable. This is a single play per card, not an autoplay chain. |
 | 2026-10-13 | Food and Things are separate, permanent card tiles (food items in Food, everyday objects in Things), replacing the temporary Things tile. This brings forward part of the food pack listed in section 12. With M3 the home would reach 7 tiles, above the 4–5 in section 6, so the tile set must be decided before M3. |
+| 2026-10-15 | Peekaboo added as a mode tile (built on branch `feature/peekaboo`, outside the milestone plan). It draws from all enabled item categories, so it adds one home tile rather than one per category. |
+| 2026-10-15 | Peekaboo: both edge zones and both swipe directions bring a new cover, since a random sequence has no "previous". The bounce follows the reveal audio as specified; a replay tap bounces at once, as on Cards. |
 | 2026-10-14 | Item sounds play twice with a 400 ms gap after the word, because single clips (under 3 s) felt too short. Clips stay under 3 s on disk. |
 
 ## 15. Acceptance criteria (v1)

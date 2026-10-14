@@ -59,5 +59,8 @@
   --t-bounce: 520ms;
   --t-ring: 560ms;
   --t-enter: 320ms;
+  --t-open: 450ms;             /* Peekaboo cover opening (500 ms or less) */
+  --t-close: 400ms;            /* Peekaboo cover closing over the next item */
+  --t-idle: 3s;                /* Peekaboo idle wiggle period */
   --ease-bounce: cubic-bezier(.3, .7, .4, 1);
 }

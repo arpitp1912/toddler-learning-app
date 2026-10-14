@@ -1,10 +1,9 @@
-import { useEffect, useRef, useState } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 import { asset, type Item } from '../content';
 import { preloadItem, sayItem, stopAll } from '../audio';
+import { useSwipe } from '../swipe';
 import { HomeButton } from './HomeButton';
 import { ChevronIcon } from './icons';
-
-const SWIPE_PX = 60;
 
 // Screen 3. One item fills the screen. Each card plays its word, then sound,
 // with a bounce or wiggle as soon as it appears, so the child learns the item
@@ -14,8 +13,6 @@ export function Cards({ items, onHome }: { items: Item[]; onHome: () => void }) 
   const [index, setIndex] = useState(0);
   const [taps, setTaps] = useState(0);
   const [moves, setMoves] = useState(0);
-  const swipeStart = useRef<{ x: number; y: number } | null>(null);
-  const swiped = useRef(false);
 
   const n = items.length;
   const item = items[index % n];
@@ -40,33 +37,11 @@ export function Cards({ items, onHome }: { items: Item[]; onHome: () => void }) 
     void sayItem(item);
   }, [moves]);
 
+  const swipe = useSwipe(go);
+
   const tapSubject = () => {
     setTaps((t) => t + 1);
     void sayItem(item);
-  };
-
-  const onPointerDown = (e: PointerEvent) => {
-    swipeStart.current = e.isPrimary ? { x: e.clientX, y: e.clientY } : null;
-    swiped.current = false;
-  };
-  const onPointerUp = (e: PointerEvent) => {
-    const s = swipeStart.current;
-    swipeStart.current = null;
-    if (!s || !e.isPrimary) return;
-    const dx = e.clientX - s.x;
-    const dy = e.clientY - s.y;
-    if (Math.abs(dx) > SWIPE_PX && Math.abs(dx) > Math.abs(dy) * 1.5) {
-      swiped.current = true;
-      go(dx < 0 ? 1 : -1);
-    }
-  };
-  // A swipe that ends on a button must not also count as a tap.
-  const onClickCapture = (e: MouseEvent) => {
-    if (swiped.current) {
-      swiped.current = false;
-      e.stopPropagation();
-      e.preventDefault();
-    }
   };
 
   const par = taps % 2 ? 'A' : 'B';
@@ -78,10 +53,7 @@ export function Cards({ items, onHome }: { items: Item[]; onHome: () => void }) 
     <div
       class="screen cards"
       style={{ touchAction: 'none' }}
-      onPointerDown={onPointerDown}
-      onPointerUp={onPointerUp}
-      onPointerCancel={() => (swipeStart.current = null)}
-      onClickCapture={onClickCapture}
+      {...swipe}
     >
       <div class="card-stage">
         <div class={`card-inner ${enter}`} key={`${item.id}-${moves}`}>

@@ -1,8 +1,15 @@
 import { asset, type Category } from '../content';
-import { SpeakerIcon } from './icons';
+import { PeekabooIcon, SpeakerIcon } from './icons';
 
-// Screen 2. One giant tile per enabled category.
-export function Home({ categories, onOpen }: { categories: Category[]; onOpen: (c: Category) => void }) {
+interface Props {
+  categories: Category[];
+  onOpen: (c: Category) => void;
+  /** Shown when the profile has the Peekaboo tile enabled and has items to hide. */
+  onPeekaboo?: () => void;
+}
+
+// Screen 2. One giant tile per enabled category, plus the Peekaboo mode tile.
+export function Home({ categories, onOpen, onPeekaboo }: Props) {
   return (
     <div class="screen home">
       <div class="tiles">
@@ -16,6 +23,11 @@ export function Home({ categories, onOpen }: { categories: Category[]; onOpen: (
             )}
           </button>
         ))}
+        {onPeekaboo && (
+          <button class="tile" data-tint="lilac" aria-label="peekaboo" onClick={onPeekaboo}>
+            <PeekabooIcon />
+          </button>
+        )}
       </div>
     </div>
   );

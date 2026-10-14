@@ -13,6 +13,7 @@ export interface Profile {
   modules: string[] | null;  // enabled category ids, null = all
   sessionLimit: SessionLimit;
   findIt: boolean;
+  peekabooSoundHint?: boolean; // unset = content.json defaults
   voicePacks: string[];
   voiceMode: 'primary' | 'rotate';
   createdAt: number;

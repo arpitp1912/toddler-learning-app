@@ -19,3 +19,7 @@ pnpm-debug.log*
 # Env
 .env
 .env.*
+
+# Playwright
+test-results/
+playwright-report/

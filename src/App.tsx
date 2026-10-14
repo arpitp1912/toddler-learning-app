@@ -6,11 +6,15 @@ import { useSession, WARNING_MS } from './session';
 import { TapToStart } from './components/TapToStart';
 import { Home } from './components/Home';
 import { Cards } from './components/Cards';
+import { Peekaboo } from './components/Peekaboo';
 import { FadingSun, Goodbye, Lock } from './components/SessionEnd';
 import { ParentCheck, ParentCorner } from './components/ParentGate';
 import { ParentPanel } from './components/ParentPanel';
 
-type View = { name: 'home' } | { name: 'cards'; categoryId: string };
+type View = { name: 'home' } | { name: 'cards'; categoryId: string } | { name: 'peekaboo' };
+
+/** Home tile id for Peekaboo in `profile.modules`, alongside category ids. */
+const PEEKABOO = 'peekaboo';
 type ParentStep = null | 'check' | 'panel';
 
 function decorItems(content: Content, key: 'start' | 'goodbye'): Item[] {
@@ -50,6 +54,14 @@ export function App() {
     () => (content && view.name === 'cards' ? itemsIn(content, view.categoryId) : []),
     [content, view],
   );
+
+  // Peekaboo hides items from every category the profile has enabled.
+  const peekabooItems = useMemo(
+    () => (content ? categories.flatMap((c) => itemsIn(content, c.id)) : []),
+    [content, categories],
+  );
+  const peekabooOn = !!profile && (profile.modules == null || profile.modules.includes(PEEKABOO)) && peekabooItems.length > 0;
+  const soundHint = profile?.peekabooSoundHint ?? content?.defaults?.peekabooSoundHint ?? false;
 
   const start = () => {
     unlockAudio();
@@ -95,8 +107,14 @@ export function App() {
       screen =
         view.name === 'cards' && deck.length ? (
           <Cards key={view.categoryId} items={deck} onHome={goHome} />
+        ) : view.name === 'peekaboo' && peekabooOn ? (
+          <Peekaboo items={peekabooItems} soundHint={soundHint} onHome={goHome} />
         ) : (
-          <Home categories={categories} onOpen={(c) => setView({ name: 'cards', categoryId: c.id })} />
+          <Home
+            categories={categories}
+            onOpen={(c) => setView({ name: 'cards', categoryId: c.id })}
+            onPeekaboo={peekabooOn ? () => setView({ name: 'peekaboo' }) : undefined}
+          />
         );
   }
 

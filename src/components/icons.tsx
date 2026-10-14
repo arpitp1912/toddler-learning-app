@@ -79,3 +79,43 @@ export const TwoFingerIcon = () => (
     <circle cx="62" cy="48" r="16" fill="none" stroke="var(--c-night-line)" stroke-width="3" />
   </svg>
 );
+
+// Home tile for Peekaboo: a bush with two eyes peeking over the top.
+export const PeekabooIcon = () => (
+  <svg {...base} class="icon icon--tile" viewBox="0 0 200 200">
+    <g fill="var(--tint-sage-edge)">
+      <circle cx="40" cy="118" r="30" />
+      <circle cx="72" cy="88" r="34" />
+      <circle cx="112" cy="78" r="36" />
+      <circle cx="150" cy="98" r="32" />
+      <circle cx="168" cy="132" r="24" />
+      <rect x="14" y="110" width="172" height="72" rx="30" />
+    </g>
+    <g fill="var(--c-hill-back)">
+      <circle cx="44" cy="124" r="22" />
+      <circle cx="74" cy="96" r="26" />
+      <circle cx="112" cy="86" r="28" />
+      <circle cx="148" cy="106" r="24" />
+      <circle cx="162" cy="140" r="18" />
+      <rect x="22" y="118" width="156" height="56" rx="24" />
+    </g>
+    <ellipse cx="100" cy="122" rx="44" ry="26" fill="var(--c-ink)" opacity=".55" />
+    <g fill="var(--c-paper)">
+      <ellipse cx="82" cy="122" rx="13" ry="15" />
+      <ellipse cx="118" cy="122" rx="13" ry="15" />
+    </g>
+    <circle cx="85" cy="125" r="6.5" fill="var(--c-ink)" />
+    <circle cx="121" cy="125" r="6.5" fill="var(--c-ink)" />
+    <circle cx="87" cy="122" r="2" fill="var(--c-paper)" />
+    <circle cx="123" cy="122" r="2" fill="var(--c-paper)" />
+    <g fill="var(--c-hill-front)">
+      <circle cx="56" cy="158" r="7" />
+      <circle cx="146" cy="160" r="6" />
+      <circle cx="106" cy="66" r="7" />
+      <circle cx="64" cy="82" r="6" />
+    </g>
+    <circle cx="40" cy="146" r="5" fill="var(--c-terracotta)" />
+    <circle cx="160" cy="118" r="5" fill="var(--c-terracotta)" />
+    <circle cx="136" cy="84" r="4.5" fill="var(--c-terracotta)" />
+  </svg>
+);

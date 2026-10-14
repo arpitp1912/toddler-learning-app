@@ -19,8 +19,14 @@ export interface Item {
   tags?: string[];
 }
 
+/** Settings a profile falls back to when it has no value of its own. */
+export interface ContentDefaults {
+  peekabooSoundHint?: boolean;
+}
+
 export interface Content {
   version: number;
+  defaults?: ContentDefaults;
   categories: Category[];
   items: Item[];
   decor?: { start?: string[]; goodbye?: string[] };

@@ -56,19 +56,28 @@ export function preloadItem(item: Item) {
   preload(item.soundAudio);
 }
 
-function playClip(path: string): Promise<boolean> {
+function playClip(path: string, volume = 1): Promise<boolean> {
   preload(path);
   const pending = buffers.get(path);
   if (!ctx || !pending) return Promise.resolve(false);
   const c = ctx;
+  const mine = seq;
   return pending.then(
     (buf) =>
       new Promise<boolean>((resolve) => {
-        if (!buf) return resolve(false);
+        // Stopped while the clip was still decoding: never start it late.
+        if (!buf || mine !== seq) return resolve(false);
         if (c.state !== 'running') void c.resume();
         const src = c.createBufferSource();
         src.buffer = buf;
-        src.connect(c.destination);
+        let out: AudioNode = c.destination;
+        if (volume < 1) {
+          const gain = c.createGain();
+          gain.gain.value = volume;
+          gain.connect(c.destination);
+          out = gain;
+        }
+        src.connect(out);
         src.onended = () => resolve(true);
         current = src;
         src.start(0);
@@ -120,20 +129,55 @@ export function stopAll() {
 const SOUND_REPEATS = 2;
 const SOUND_GAP_MS = 400;
 
+// Voice-pack prompt clips (SPEC 8a), keyed by prompt id ("peekaboo"). Voice
+// packs (M5) register theirs here; until then prompts use the device voice.
+const promptClips = new Map<string, string>();
+
+export function setPromptClip(key: string, path: string | null) {
+  if (path) promptClips.set(key, path);
+  else promptClips.delete(key);
+}
+
+async function sayPrompt(key: string, text: string, mine: number) {
+  const clip = promptClips.get(key);
+  if (clip && (await playClip(clip))) return;
+  if (mine === seq) await speak(text);
+}
+
+/** Word, then sound twice with a short gap. Resolves false if interrupted. */
+async function playItem(item: Item, mine: number): Promise<boolean> {
+  const recorded = item.wordAudio ? await playClip(item.wordAudio) : false;
+  if (mine !== seq) return false;
+  if (!recorded) await speak(item.word);
+  for (let i = 0; i < SOUND_REPEATS && item.soundAudio; i++) {
+    if (mine !== seq) return false;
+    if (i > 0) await new Promise((r) => setTimeout(r, SOUND_GAP_MS));
+    if (mine !== seq) return false;
+    if (!(await playClip(item.soundAudio))) break;
+  }
+  return mine === seq;
+}
+
 /**
  * Plays an item's word, then its sound twice with a short gap (clips are under
  * 3 s, too short on their own). A new call interrupts the previous one.
  */
 export async function sayItem(item: Item) {
   stopAll();
+  await playItem(item, seq);
+}
+
+/** "Peekaboo", then the item as on a card. Resolves true if it played to the end. */
+export async function sayPeekaboo(item: Item): Promise<boolean> {
+  stopAll();
   const mine = seq;
-  const recorded = item.wordAudio ? await playClip(item.wordAudio) : false;
-  if (mine !== seq) return;
-  if (!recorded) await speak(item.word);
-  for (let i = 0; i < SOUND_REPEATS; i++) {
-    if (mine !== seq || !item.soundAudio) return;
-    if (i > 0) await new Promise((r) => setTimeout(r, SOUND_GAP_MS));
-    if (mine !== seq) return;
-    if (!(await playClip(item.soundAudio))) return;
-  }
+  await sayPrompt('peekaboo', 'peekaboo', mine);
+  if (mine !== seq) return false;
+  return playItem(item, mine);
+}
+
+/** The item's sound once, quietly (Peekaboo sound hint). Silent if it has none. */
+export function hintItem(item: Item, volume: number) {
+  stopAll();
+  if (item.soundAudio) void playClip(item.soundAudio, volume);
 }
