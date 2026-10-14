@@ -117,13 +117,23 @@ export function stopAll() {
   if (hasSpeech) speechSynthesis.cancel();
 }
 
-/** Plays an item's word, then its sound. A new call interrupts the previous one. */
+const SOUND_REPEATS = 2;
+const SOUND_GAP_MS = 400;
+
+/**
+ * Plays an item's word, then its sound twice with a short gap (clips are under
+ * 3 s, too short on their own). A new call interrupts the previous one.
+ */
 export async function sayItem(item: Item) {
   stopAll();
   const mine = seq;
   const recorded = item.wordAudio ? await playClip(item.wordAudio) : false;
   if (mine !== seq) return;
   if (!recorded) await speak(item.word);
-  if (mine !== seq || !item.soundAudio) return;
-  await playClip(item.soundAudio);
+  for (let i = 0; i < SOUND_REPEATS; i++) {
+    if (mine !== seq || !item.soundAudio) return;
+    if (i > 0) await new Promise((r) => setTimeout(r, SOUND_GAP_MS));
+    if (mine !== seq) return;
+    if (!(await playClip(item.soundAudio))) return;
+  }
 }
