@@ -2,7 +2,12 @@ import { defineConfig } from 'vite';
 import preact from '@preact/preset-vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
+// Lets a Cloudflare quick tunnel reach the local servers for remote phone testing.
+const allowedHosts = ['.trycloudflare.com'];
+
 export default defineConfig({
+  server: { allowedHosts },
+  preview: { allowedHosts },
   build: {
     // iOS / iPadOS Safari 16 is the floor (SPEC section 4).
     target: ['es2020', 'safari16'],
