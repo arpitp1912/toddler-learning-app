@@ -36,7 +36,7 @@ An offline-capable, installable web app for toddlers aged 18–30 months. It rep
 
 | Item | Behaviour |
 |---|---|
-| Profile fields | id, display name (parent-only), avatar photo (from camera or library) or preset animal avatar, age band, enabled modules (home tile ids: category ids plus `peekaboo`), session limit (minutes), Peekaboo sound hint, assigned voice packs and voice mode, created date |
+| Profile fields | id, display name (parent-only), avatar photo (from camera or library) or preset animal avatar, age band, enabled modules (home tile ids: category ids plus `peekaboo` and `bubbles`), session limit (minutes), Peekaboo sound hint, Bubbles speed, assigned voice packs and voice mode, created date |
 | Multiple profiles | Unlimited profiles per device, for example Grandma's iPad holding both children. |
 | Launch | Opens directly into the last-used profile. The child never sees a picker by default. |
 | Switching | Done from the parent area. An optional toddler-facing picker (large avatar faces) can be turned on. |
@@ -57,6 +57,16 @@ An offline-capable, installable web app for toddlers aged 18–30 months. It rep
    - **Items:** drawn at random from the item categories enabled for the profile, with no repeats until every item has been shown. Item images only, never scene images. Item audio and fallbacks as on Cards.
    - **Sound hint (profile setting, off by default):** when on, the hidden item's sound plays once at 40% volume after "peekaboo" as each new cover appears. The default comes from `defaults.peekabooSoundHint` in `content.json`; a profile value overrides it.
    - **Home tile:** a bush with two eyes peeking, drawn in SVG. It shows when the profile's enabled modules allow `peekaboo` (all tiles are on when no list is set).
+8. **Bubbles:** item bubbles rise slowly over a soft sky gradient. There are 4 on iPad and 3 on iPhone (short edge under 600 px).
+   - **Size and paths:** each bubble is at least max(160 px, 28% of the short edge) across, with a hit area 15% larger. Bubbles rise from bottom to top in about 10 s (slow, default) or 6 s (normal) with a gentle sway. They stay to the right of the home button and never overlap: all bubbles rise at the same speed, and a bubble only enters at the bottom when it can't touch any bubble whose path it shares. A bubble that leaves the top comes back at the bottom with a new item.
+   - **Look:** a translucent bubble (rim highlight and soft sheen) drawn in inline SVG, with the item image inside at 70% of its diameter.
+   - **Pop:** a bubble pops on pointerdown, not click, and each finger pops its own bubble. The pop is a burst (expanding ring and small droplets, 300 ms or less) with a soft synthesised pop (a sine blip with falling pitch, no audio file). The item stays where the bubble was, bounces, says its word and then its sound (as on Cards), and fades after 1.5 s. A new bubble arrives 0.5 s later. A new pop stops the previous item's word or sound at once, so item audio never overlaps.
+   - **Items:** drawn at random from the item categories enabled for the profile, never two of the same on screen, and no repeats until every item has been shown.
+   - **Speed (profile setting):** slow (default) or normal. The default comes from `defaults.bubbleSpeed` in `content.json`; a profile value overrides it.
+   - **Reduced motion:** the bubbles sit still in a grid. A tap pops in place, and a new bubble fades into the same spot once the popped item has faded.
+   - **Session:** from the one-minute warning, no new bubbles appear (the bubbles already showing stay until they leave or are popped). At the limit, the goodbye takes over as usual.
+   - **Motion budget:** positions are set with `translate3d` from one `requestAnimationFrame` loop. Only transform and opacity animate (no filters, blur or animated shadows), to hold 60 fps on older iPads.
+   - **Home tile:** three bubbles with a duck inside the largest, drawn in SVG. It follows the same `modules` rule as Peekaboo (`bubbles`).
 
 ## 7. Session control
 - Each profile has a limit of 5, 10, 15 or 20 minutes, or off.
@@ -67,7 +77,7 @@ An offline-capable, installable web app for toddlers aged 18–30 months. It rep
 - Manage profiles: create, edit, delete, export and import.
 - **Voice packs (optional, M5):** see section 8a.
 - Custom photo cards: take a photo, record a word, choose a category. Stored per profile.
-- Settings: modules on or off (including the Peekaboo tile), session limit, Find-it mode, Peekaboo sound hint, toddler-facing profile picker, PIN.
+- Settings: modules on or off (including the Peekaboo and Bubbles tiles), session limit, Find-it mode, Peekaboo sound hint, Bubbles speed (slow or normal), toddler-facing profile picker, PIN.
 - Usage log: sessions per day, minutes, most-tapped items. Local only.
 - Setup help: how to install to the home screen and how to enable Guided Access.
 
@@ -92,7 +102,7 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 ```json
 {
   "version": 1,
-  "defaults": { "peekabooSoundHint": false },
+  "defaults": { "peekabooSoundHint": false, "bubbleSpeed": "slow" },
   "categories": [
     { "id": "animals", "icon": "img/cat/animals.webp" }
   ],
@@ -122,7 +132,7 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 ```
 - Hotspot x, y and r are fractions of the image's width and height, so they scale across devices.
 - `word` is used as the text-to-speech fallback if `wordAudio` is missing.
-- `defaults` holds profile settings used until a profile sets its own (currently `peekabooSoundHint`).
+- `defaults` holds profile settings used until a profile sets its own (currently `peekabooSoundHint` and `bubbleSpeed`).
 
 **v1 content target:** 40 animals, 20 everyday sounds (vehicles, household, nature), 5 scenes, counting objects for 1–5, 26 letter–object pairs. Letter objects reuse items wherever possible.
 
@@ -179,6 +189,10 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 | 2026-10-15 | Peekaboo added as a mode tile (built on branch `feature/peekaboo`, outside the milestone plan). It draws from all enabled item categories, so it adds one home tile rather than one per category. |
 | 2026-10-15 | Peekaboo: "peekaboo" is said when each cover appears, not when it is tapped, so the reveal goes straight to the item. |
 | 2026-10-15 | Peekaboo: both edge zones and both swipe directions bring a new cover, since a random sequence has no "previous". The bounce follows the reveal audio as specified; a replay tap bounces at once, as on Cards. |
+| 2026-10-15 | Bubbles added as a mode tile (branch `feature/bubbles`, built on `feature/peekaboo`). The home now has 6 tiles by default (4 categories, Peekaboo, Bubbles), above the 4–5 in section 6. Nothing enforces a maximum yet; a profile's `modules` list can trim the tiles. The tile set still needs deciding before M3 (see 2026-10-13). |
+| 2026-10-15 | Bubbles: bubbles may pass under the parent-gate corner (top right). Avoiding it as well as the home button leaves too little width on iPhone portrait for even one bubble. A single tap there reaches the gate, not the bubble, but the bubble keeps rising into reach. |
+| 2026-10-15 | Bubbles: the screen starts filled (bubbles spread up the screen) rather than empty, including when opened during the one-minute warning. Only new bubbles stop during the warning. |
+| 2026-10-15 | Bubbles, reduced motion: the replacement bubble fades in once the popped item has faded (about 1.8 s), not at 0.5 s, so the old item and the new bubble never overlap in the same spot. |
 | 2026-10-14 | Item sounds play twice with a 400 ms gap after the word, because single clips (under 3 s) felt too short. Clips stay under 3 s on disk. |
 
 ## 15. Acceptance criteria (v1)

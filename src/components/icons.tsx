@@ -119,3 +119,34 @@ export const PeekabooIcon = () => (
     <circle cx="136" cy="84" r="4.5" fill="var(--c-terracotta)" />
   </svg>
 );
+
+// Home tile for Bubbles: three bubbles, a duck inside the largest.
+const TileBubble = ({ cx, cy, r }: { cx: number; cy: number; r: number }) => (
+  <>
+    <circle cx={cx} cy={cy} r={r} fill="var(--c-paper)" fill-opacity=".45" stroke="var(--tint-sky-edge)" stroke-width="4" />
+    <ellipse
+      cx={cx - r * 0.38}
+      cy={cy - r * 0.45}
+      rx={r * 0.26}
+      ry={r * 0.13}
+      transform={`rotate(-38 ${cx - r * 0.38} ${cy - r * 0.45})`}
+      fill="var(--c-paper)"
+    />
+  </>
+);
+
+export const BubblesIcon = () => (
+  <svg {...base} class="icon icon--tile" viewBox="0 0 200 200">
+    <circle cx="94" cy="112" r="62" fill="var(--c-paper)" fill-opacity=".45" stroke="var(--tint-sky-edge)" stroke-width="4" />
+    {/* Duck */}
+    <ellipse cx="90" cy="130" rx="32" ry="20" fill="var(--c-honey)" />
+    <path d="M62 124q-8-14 4-16q6 8 10 14z" fill="var(--c-honey)" />
+    <circle cx="112" cy="102" r="17" fill="var(--c-honey)" />
+    <path d="M126 100q14-1 16 6q-8 6-17 4z" fill="var(--c-terracotta)" />
+    <circle cx="116" cy="98" r="3.4" fill="var(--c-ink)" />
+    <path d="M78 128q12 10 26 0" fill="none" stroke="var(--c-sun)" stroke-width="4" stroke-linecap="round" />
+    <ellipse cx="70" cy="76" rx="16" ry="8" transform="rotate(-38 70 76)" fill="var(--c-paper)" />
+    <TileBubble cx={160} cy={62} r={26} />
+    <TileBubble cx={150} cy={160} r={17} />
+  </svg>
+);

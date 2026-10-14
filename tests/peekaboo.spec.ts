@@ -1,38 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
+import { openTile, spoken } from './helpers';
 
-// Records what the app asks the speech synth and Web Audio to play.
-async function spyOnAudio(page: Page) {
-  await page.addInitScript(() => {
-    const w = window as unknown as { __spoken: string[]; __clips: number };
-    w.__spoken = [];
-    w.__clips = 0;
-    if ('SpeechSynthesis' in window) {
-      const speak = SpeechSynthesis.prototype.speak;
-      SpeechSynthesis.prototype.speak = function (this: SpeechSynthesis, u: SpeechSynthesisUtterance) {
-        if (u.text.trim()) w.__spoken.push(u.text);
-        speak.call(this, u);
-      };
-    }
-    const start = AudioBufferSourceNode.prototype.start;
-    AudioBufferSourceNode.prototype.start = function (this: AudioBufferSourceNode, ...args: [number?, number?, number?]) {
-      if (this.buffer && this.buffer.length > 1) w.__clips++;
-      return start.apply(this, args);
-    };
-  });
-}
-
-const spoken = (page: Page) => page.evaluate(() => (window as unknown as { __spoken: string[] }).__spoken);
-
-async function openPeekaboo(page: Page) {
-  const errors: string[] = [];
-  page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
-  page.on('pageerror', (e) => errors.push(String(e)));
-  await spyOnAudio(page);
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Start' }).click();
-  await page.getByRole('button', { name: 'peekaboo' }).click();
-  return errors;
-}
+const openPeekaboo = (page: Page) => openTile(page, 'peekaboo');
 
 /** Taps the centre of the cover twice in quick succession, like an eager toddler. */
 async function doubleTapCover(page: Page) {

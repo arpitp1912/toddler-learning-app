@@ -2,7 +2,8 @@ import { defineConfig, devices } from '@playwright/test';
 
 // Smoke tests against the production build (service worker included).
 // WebKit stands in for iOS Safari; Chromium is a second engine.
-const PORT = 4173;
+// Not 4173, so a manual `npm run preview` (or a tunnel to it) can keep running.
+const PORT = 4174;
 const sizes = { ipad: { width: 1180, height: 820 }, iphone: { width: 390, height: 844 } };
 
 export default defineConfig({

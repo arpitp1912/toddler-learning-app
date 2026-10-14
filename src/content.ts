@@ -20,8 +20,11 @@ export interface Item {
 }
 
 /** Settings a profile falls back to when it has no value of its own. */
+export type BubbleSpeed = 'slow' | 'normal';
+
 export interface ContentDefaults {
   peekabooSoundHint?: boolean;
+  bubbleSpeed?: BubbleSpeed;
 }
 
 export interface Content {

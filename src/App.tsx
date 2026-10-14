@@ -7,14 +7,16 @@ import { TapToStart } from './components/TapToStart';
 import { Home } from './components/Home';
 import { Cards } from './components/Cards';
 import { Peekaboo } from './components/Peekaboo';
+import { Bubbles } from './components/Bubbles';
 import { FadingSun, Goodbye, Lock } from './components/SessionEnd';
 import { ParentCheck, ParentCorner } from './components/ParentGate';
 import { ParentPanel } from './components/ParentPanel';
 
-type View = { name: 'home' } | { name: 'cards'; categoryId: string } | { name: 'peekaboo' };
+type View = { name: 'home' } | { name: 'cards'; categoryId: string } | { name: 'peekaboo' } | { name: 'bubbles' };
 
-/** Home tile id for Peekaboo in `profile.modules`, alongside category ids. */
+/** Home tile ids for the modes in `profile.modules`, alongside category ids. */
 const PEEKABOO = 'peekaboo';
+const BUBBLES = 'bubbles';
 type ParentStep = null | 'check' | 'panel';
 
 function decorItems(content: Content, key: 'start' | 'goodbye'): Item[] {
@@ -55,13 +57,17 @@ export function App() {
     [content, view],
   );
 
-  // Peekaboo hides items from every category the profile has enabled.
-  const peekabooItems = useMemo(
+  // Peekaboo and Bubbles draw items from every category the profile has enabled.
+  const mixedItems = useMemo(
     () => (content ? categories.flatMap((c) => itemsIn(content, c.id)) : []),
     [content, categories],
   );
-  const peekabooOn = !!profile && (profile.modules == null || profile.modules.includes(PEEKABOO)) && peekabooItems.length > 0;
+  const modeOn = (id: string) =>
+    !!profile && (profile.modules == null || profile.modules.includes(id)) && mixedItems.length > 0;
+  const peekabooOn = modeOn(PEEKABOO);
+  const bubblesOn = modeOn(BUBBLES);
   const soundHint = profile?.peekabooSoundHint ?? content?.defaults?.peekabooSoundHint ?? false;
+  const bubbleSpeed = profile?.bubbleSpeed ?? content?.defaults?.bubbleSpeed ?? 'slow';
 
   const start = () => {
     unlockAudio();
@@ -92,6 +98,9 @@ export function App() {
   }
   if (!content || !profile || session.phase === 'boot') return <div class="screen boot" />;
 
+  const warning =
+    session.phase === 'play' && session.remainingMs != null && session.remainingMs <= WARNING_MS;
+
   let screen;
   switch (session.phase) {
     case 'start':
@@ -108,18 +117,18 @@ export function App() {
         view.name === 'cards' && deck.length ? (
           <Cards key={view.categoryId} items={deck} onHome={goHome} />
         ) : view.name === 'peekaboo' && peekabooOn ? (
-          <Peekaboo items={peekabooItems} soundHint={soundHint} onHome={goHome} />
+          <Peekaboo items={mixedItems} soundHint={soundHint} onHome={goHome} />
+        ) : view.name === 'bubbles' && bubblesOn ? (
+          <Bubbles items={mixedItems} speed={bubbleSpeed} spawning={!warning} onHome={goHome} />
         ) : (
           <Home
             categories={categories}
             onOpen={(c) => setView({ name: 'cards', categoryId: c.id })}
             onPeekaboo={peekabooOn ? () => setView({ name: 'peekaboo' }) : undefined}
+            onBubbles={bubblesOn ? () => setView({ name: 'bubbles' }) : undefined}
           />
         );
   }
-
-  const warning =
-    session.phase === 'play' && session.remainingMs != null && session.remainingMs <= WARNING_MS;
 
   return (
     <>

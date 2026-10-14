@@ -24,6 +24,16 @@
   --tint-butter: #F5E2A8; --tint-butter-edge: #DDC57F;
   --tint-lilac: #E2D8EE;  --tint-lilac-edge: #C6B8DA;
 
+  /* Bubbles: sky and translucent bubble */
+  --c-sky-top: var(--tint-sky);
+  --c-sky-bottom: var(--c-cream);
+  --bubble-core: rgba(255, 255, 255, .16);
+  --bubble-edge: rgba(178, 202, 219, .55);   /* --tint-sky-edge, translucent */
+  --bubble-rim: rgba(255, 255, 255, .92);
+  --bubble-rim-tint: rgba(178, 202, 219, .8);
+  --bubble-sheen: rgba(255, 255, 255, .85);
+  --bubble-drop: var(--tint-sky-edge);
+
   /* Session ending */
   --c-dusk: #E9A27C;
   --c-goodbye-sky: #E8CDD6;
@@ -62,5 +72,7 @@
   --t-open: 450ms;             /* Peekaboo cover opening (500 ms or less) */
   --t-close: 400ms;            /* Peekaboo cover closing over the next item */
   --t-idle: 3s;                /* Peekaboo idle wiggle period */
+  --t-burst: 280ms;            /* Bubbles pop burst (300 ms or less) */
+  --t-popped-fade: 300ms;      /* popped item fading out after 1.5 s */
   --ease-bounce: cubic-bezier(.3, .7, .4, 1);
 }

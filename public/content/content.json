@@ -1,7 +1,8 @@
 {
   "version": 1,
   "defaults": {
-    "peekabooSoundHint": false
+    "peekabooSoundHint": false,
+    "bubbleSpeed": "slow"
   },
   "categories": [
     {

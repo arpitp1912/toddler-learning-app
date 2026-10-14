@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { asset, type Item } from '../content';
-import { preloadItem, sayItem, sayPeekaboo, stopAll } from '../audio';
+import { sayItem, sayPeekaboo, stopAll } from '../audio';
+import { preloadItemAssets, useShuffleBag } from '../items';
 import { useSwipe } from '../swipe';
 import { HomeButton } from './HomeButton';
 import { ChevronIcon } from './icons';
@@ -11,32 +12,6 @@ const CLOSE_MS = 400; // --t-close
 const HINT_VOLUME = 0.4;
 
 type Phase = 'covered' | 'opening' | 'revealed' | 'closing';
-
-/** Draws items at random, with no repeats until every item has been shown. */
-function useShuffleBag(items: Item[]) {
-  const bag = useRef<Item[]>([]);
-  const last = useRef<Item | null>(null);
-  return () => {
-    if (!bag.current.length) {
-      const b = [...items];
-      for (let i = b.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [b[i], b[j]] = [b[j], b[i]];
-      }
-      // Never the same item twice in a row across a refill.
-      const end = b.length - 1;
-      if (end > 0 && b[end] === last.current) [b[0], b[end]] = [b[end], b[0]];
-      bag.current = b;
-    }
-    last.current = bag.current.pop()!;
-    return last.current;
-  };
-}
-
-function preloadAll(item: Item) {
-  preloadItem(item);
-  new Image().src = asset(item.image);
-}
 
 // Peekaboo. One big cover hides an item and says "peekaboo" as it appears;
 // tapping it opens the cover, says the item, then bounces. Edge zones or a swipe close a new
@@ -63,9 +38,9 @@ export function Peekaboo({ items, soundHint, onHome }: { items: Item[]; soundHin
   };
 
   useEffect(() => {
-    preloadAll(item);
+    preloadItemAssets(item);
     upcoming.current = draw();
-    preloadAll(upcoming.current);
+    preloadItemAssets(upcoming.current);
     return () => {
       if (timer.current) clearTimeout(timer.current);
       stopAll();
@@ -101,7 +76,7 @@ export function Peekaboo({ items, soundHint, onHome }: { items: Item[]; soundHin
     stopAll();
     const n = upcoming.current ?? draw();
     upcoming.current = draw();
-    preloadAll(upcoming.current);
+    preloadItemAssets(upcoming.current);
     setCover((c) => c + 1);
     const arrive = () => {
       setItem(n);

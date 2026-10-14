@@ -178,3 +178,30 @@ export async function sayPeekaboo(hint?: { item: Item; volume: number }) {
   await sayPrompt('peekaboo', 'peekaboo', mine);
   if (mine === seq && hint?.item.soundAudio) await playClip(hint.item.soundAudio, hint.volume);
 }
+
+/**
+ * Soft bubble pop, synthesised (no audio file): a short sine blip with a
+ * falling pitch. It is a sound effect, so it is not stopped by stopAll and
+ * never interrupts item audio.
+ */
+export function popSound() {
+  if (!ctx) return;
+  try {
+    if (ctx.state !== 'running') void ctx.resume();
+    const t = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(720, t);
+    osc.frequency.exponentialRampToValueAtTime(240, t + 0.12);
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(0.3, t + 0.008);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.14);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + 0.16);
+  } catch (err) {
+    console.warn('[audio] pop unavailable', err);
+  }
+}
