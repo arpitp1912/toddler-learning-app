@@ -49,6 +49,8 @@ test('cover reveals an item with audio, and the edge brings a new cover', async 
 
   const cover = page.locator('.cover');
   await expect(cover).toBeVisible();
+  // "peekaboo" as the cover appears, before any tap.
+  await expect.poll(() => spoken(page), { timeout: 10_000 }).toEqual(['peekaboo']);
   const box = (await cover.boundingBox())!;
   const vp = page.viewportSize()!;
   expect(Math.min(box.width, box.height)).toBeGreaterThanOrEqual(0.6 * Math.min(vp.width, vp.height));
@@ -59,16 +61,17 @@ test('cover reveals an item with audio, and the edge brings a new cover', async 
   const word = (await subject.getAttribute('aria-label'))!;
   expect(word).toBeTruthy();
 
-  // "peekaboo", then the word, said once even though the cover was tapped twice.
-  await expect.poll(() => spoken(page), { timeout: 10_000 }).toEqual(expect.arrayContaining(['peekaboo', word]));
+  // The word, said once even though the cover was tapped twice.
+  await expect.poll(() => spoken(page), { timeout: 10_000 }).toEqual(['peekaboo', word]);
   await page.waitForTimeout(500);
-  expect((await spoken(page)).filter((t) => t === 'peekaboo')).toHaveLength(1);
+  expect(await spoken(page)).toEqual(['peekaboo', word]);
 
   // Edge tap: the cover closes over a different item.
   await page.locator('.edge--next').click();
   await expect(cover).toBeVisible();
   await expect(cover).toHaveClass(/is-covered/);
   await expect(subject).not.toHaveAttribute('aria-label', word);
+  await expect.poll(async () => (await spoken(page)).filter((t) => t === 'peekaboo').length).toBe(2);
 
   // A swipe also brings a new cover, without revealing.
   const before = await subject.getAttribute('aria-label');
@@ -85,8 +88,10 @@ test('cover reveals an item with audio, and the edge brings a new cover', async 
 test('reduced motion still reveals the item', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   const errors = await openPeekaboo(page);
+  await expect.poll(() => spoken(page), { timeout: 10_000 }).toContain('peekaboo');
   await page.locator('.cover').click();
   await expect(page.locator('.cover')).toHaveCount(0);
-  await expect.poll(() => spoken(page), { timeout: 10_000 }).toContain('peekaboo');
+  const word = (await page.locator('.subject').getAttribute('aria-label'))!;
+  await expect.poll(() => spoken(page), { timeout: 10_000 }).toContain(word);
   expect(errors).toEqual([]);
 });

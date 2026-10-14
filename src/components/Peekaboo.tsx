@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { asset, type Item } from '../content';
-import { hintItem, preloadItem, sayItem, sayPeekaboo, stopAll } from '../audio';
+import { preloadItem, sayItem, sayPeekaboo, stopAll } from '../audio';
 import { useSwipe } from '../swipe';
 import { HomeButton } from './HomeButton';
 import { ChevronIcon } from './icons';
@@ -38,8 +38,8 @@ function preloadAll(item: Item) {
   new Image().src = asset(item.image);
 }
 
-// Peekaboo. One big cover hides an item; tapping it opens the cover, says
-// "peekaboo" and the item, then bounces. Edge zones or a swipe close a new
+// Peekaboo. One big cover hides an item and says "peekaboo" as it appears;
+// tapping it opens the cover, says the item, then bounces. Edge zones or a swipe close a new
 // cover over the next item. Covers rotate bush → door → cloud → blanket.
 export function Peekaboo({ items, soundHint, onHome }: { items: Item[]; soundHint: boolean; onHome: () => void }) {
   const draw = useShuffleBag(items);
@@ -72,9 +72,10 @@ export function Peekaboo({ items, soundHint, onHome }: { items: Item[]; soundHin
     };
   }, []);
 
-  // Each new cover can quietly play the hidden item's sound (profile setting).
+  // Each new cover says "peekaboo", then can quietly play the hidden item's
+  // sound (profile setting).
   useEffect(() => {
-    if (soundHint) hintItem(item, HINT_VOLUME);
+    void sayPeekaboo(soundHint ? { item, volume: HINT_VOLUME } : undefined);
   }, [round]);
 
   const open = () => {
@@ -84,7 +85,7 @@ export function Peekaboo({ items, soundHint, onHome }: { items: Item[]; soundHin
     setPhase('opening');
     later(OPEN_MS, () => {
       setPhase('revealed');
-      void sayPeekaboo(item).then((done) => done && setBounces((b) => b + 1));
+      void sayItem(item).then((done) => done && setBounces((b) => b + 1));
     });
   };
 

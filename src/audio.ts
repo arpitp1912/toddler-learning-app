@@ -161,23 +161,20 @@ async function playItem(item: Item, mine: number): Promise<boolean> {
 /**
  * Plays an item's word, then its sound twice with a short gap (clips are under
  * 3 s, too short on their own). A new call interrupts the previous one.
+ * Resolves true if it played to the end.
  */
-export async function sayItem(item: Item) {
+export async function sayItem(item: Item): Promise<boolean> {
   stopAll();
-  await playItem(item, seq);
+  return playItem(item, seq);
 }
 
-/** "Peekaboo", then the item as on a card. Resolves true if it played to the end. */
-export async function sayPeekaboo(item: Item): Promise<boolean> {
+/**
+ * "Peekaboo" as a new cover appears. With `hint`, the hidden item's sound
+ * follows once, quietly (Peekaboo sound hint). Silent hint if it has none.
+ */
+export async function sayPeekaboo(hint?: { item: Item; volume: number }) {
   stopAll();
   const mine = seq;
   await sayPrompt('peekaboo', 'peekaboo', mine);
-  if (mine !== seq) return false;
-  return playItem(item, mine);
-}
-
-/** The item's sound once, quietly (Peekaboo sound hint). Silent if it has none. */
-export function hintItem(item: Item, volume: number) {
-  stopAll();
-  if (item.soundAudio) void playClip(item.soundAudio, volume);
+  if (mine === seq && hint?.item.soundAudio) await playClip(hint.item.soundAudio, hint.volume);
 }
