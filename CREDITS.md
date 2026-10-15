@@ -20,6 +20,10 @@ All sounds are from [Freesound](https://freesound.org) and use the CC0 licence (
 
 Illustrations were generated with Gemini (fallback: ChatGPT) using the locked prompt in `STYLE.md`.
 
+## Voice
+
+The built-in word and prompt audio is generated with Gemini text-to-speech (`npm run tts`, voice Sulafat unless `GEMINI_TTS_VOICE` says otherwise), until family recordings in `content-src/voice/family/` replace it.
+
 ## Fonts
 
 The app uses the device's system font. No font files are bundled.

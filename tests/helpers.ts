@@ -32,11 +32,30 @@ export async function spyOnAudio(page: Page) {
 export const spoken = (page: Page) => page.evaluate(() => (window as unknown as Spy).__spoken);
 export const blips = (page: Page) => page.evaluate(() => (window as unknown as Spy).__blips);
 
-/** Loads the app, presses play and opens a home tile. Returns collected console errors. */
+type Json = Record<string, any>;
+
+/**
+ * Serves content.json without the built-in voice (`wordAudio`, prompt `audio`),
+ * so words and prompts always go to the speech synth, where tests can see them,
+ * however much voice has been generated. `edit` can change it further.
+ * Needs `serviceWorkers: 'block'`, or the service worker answers instead.
+ */
+export async function serveContent(page: Page, edit: (json: Json) => void = () => {}) {
+  await page.route('**/content/content.json', async (route) => {
+    const json: Json = await (await route.fetch()).json();
+    for (const item of json.items) delete item.wordAudio;
+    for (const prompt of json.prompts ?? []) delete prompt.audio;
+    edit(json);
+    await route.fulfill({ json });
+  });
+}
+
+/** Loads the app, presses play and opens a home tile. Returns collected console errors. Needs `serviceWorkers: 'block'`. */
 export async function openTile(page: Page, tile: string) {
   const errors: string[] = [];
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
   page.on('pageerror', (e) => errors.push(String(e)));
+  await serveContent(page);
   await spyOnAudio(page);
   await page.goto('/');
   await page.getByRole('button', { name: 'Start' }).click();

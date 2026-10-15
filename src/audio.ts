@@ -1,7 +1,7 @@
 // Small audio wrapper: Web Audio for recorded clips, speech synthesis as the
 // built-in default voice until recorded word audio exists (SPEC sections 9, 11).
 import { AudioContextCtor, hasSpeech } from './features';
-import { asset, type Item } from './content';
+import { asset, type Item, type Prompt } from './content';
 
 let ctx: AudioContext | null = null;
 const buffers = new Map<string, Promise<AudioBuffer | null>>();
@@ -33,6 +33,7 @@ export function unlockAudio() {
     speechSynthesis.speak(u);
     pickVoice();
   }
+  for (const path of builtInPrompts.values()) preload(path);
 }
 
 /** Starts fetching and decoding a clip. Safe to call many times. */
@@ -129,19 +130,42 @@ export function stopAll() {
 const SOUND_REPEATS = 2;
 const SOUND_GAP_MS = 400;
 
-// Voice-pack prompt clips (SPEC 8a), keyed by prompt id ("peekaboo"). Voice
-// packs (M5) register theirs here; until then prompts use the device voice.
+// Prompt clips (SPEC 8a), keyed by prompt id ("peekaboo"). Voice packs (M5)
+// register theirs here; they win over the built-in voice from content.json,
+// and the device voice says the text when neither has a clip.
 const promptClips = new Map<string, string>();
+const builtInPrompts = new Map<string, string>();
+const promptTexts = new Map<string, string>();
 
 export function setPromptClip(key: string, path: string | null) {
   if (path) promptClips.set(key, path);
   else promptClips.delete(key);
 }
 
+/** Registers content.json prompts: their built-in clips and fallback texts. */
+export function setBuiltInPrompts(prompts: Prompt[] = []) {
+  builtInPrompts.clear();
+  for (const p of prompts) {
+    promptTexts.set(p.id, p.text);
+    if (p.audio) {
+      builtInPrompts.set(p.id, p.audio);
+      preload(p.audio);
+    }
+  }
+}
+
 async function sayPrompt(key: string, text: string, mine: number) {
-  const clip = promptClips.get(key);
-  if (clip && (await playClip(clip))) return;
-  if (mine === seq) await speak(text);
+  for (const clip of [promptClips.get(key), builtInPrompts.get(key)]) {
+    if (clip && (await playClip(clip))) return;
+    if (mine !== seq) return;
+  }
+  await speak(promptTexts.get(key) ?? text);
+}
+
+/** Goodbye screen: "Bye bye!" (prompt `bye`). */
+export async function sayBye() {
+  stopAll();
+  await sayPrompt('bye', 'Bye bye!', seq);
 }
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));

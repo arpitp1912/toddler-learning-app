@@ -6,7 +6,7 @@ import {
 } from './db';
 import type { ProfileBundle } from './backup';
 import { forgetPhotoUrl } from './photos';
-import { stopAll, unlockAudio } from './audio';
+import { setBuiltInPrompts, stopAll, unlockAudio } from './audio';
 import { useSession, WARNING_MS } from './session';
 import { TapToStart } from './components/TapToStart';
 import { Home } from './components/Home';
@@ -58,6 +58,7 @@ export function App() {
     loadContent().then(
       async (c) => {
         setContent(c);
+        setBuiltInPrompts(c.prompts);
         setProfile(await loadProfile(avatarItems(c)[0]?.id ?? ''));
         await refreshProfiles();
       },

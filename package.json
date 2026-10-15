@@ -9,6 +9,8 @@
     "preview": "vite preview --host",
     "assets": "node scripts/convert-images.mjs",
     "audio": "node scripts/convert-audio.mjs",
+    "voice": "node scripts/voice.mjs",
+    "tts": "node --env-file-if-exists=.env scripts/tts.mjs",
     "test": "vitest run && playwright test",
     "test:unit": "vitest run",
     "test:e2e": "playwright test"

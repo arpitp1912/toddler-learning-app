@@ -1,6 +1,10 @@
 import { expect, test, type Page } from '@playwright/test';
 import { openTile, spoken } from './helpers';
 
+// The route in openTile serves content.json without the built-in voice; it
+// only applies with the service worker blocked.
+test.use({ serviceWorkers: 'block' });
+
 const openPeekaboo = (page: Page) => openTile(page, 'peekaboo');
 
 /** Taps the centre of the cover twice in quick succession, like an eager toddler. */

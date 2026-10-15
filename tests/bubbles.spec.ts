@@ -1,6 +1,10 @@
 import { expect, test, type Page } from '@playwright/test';
 import { blips, openTile, spoken } from './helpers';
 
+// The route in openTile serves content.json without the built-in voice; it
+// only applies with the service worker blocked.
+test.use({ serviceWorkers: 'block' });
+
 const expectedCount = (page: Page) => {
   const vp = page.viewportSize()!;
   return Math.min(vp.width, vp.height) >= 600 ? 4 : 3;

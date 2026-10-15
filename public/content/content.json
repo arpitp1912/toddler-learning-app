@@ -44,7 +44,8 @@
       "guessable": true,
       "tags": [
         "farm"
-      ]
+      ],
+      "wordAudio": "audio/words/cow.m4a"
     },
     {
       "id": "duck",
@@ -56,7 +57,8 @@
       "guessable": true,
       "tags": [
         "farm"
-      ]
+      ],
+      "wordAudio": "audio/words/duck.m4a"
     },
     {
       "id": "dog",
@@ -68,7 +70,8 @@
       "guessable": true,
       "tags": [
         "pets"
-      ]
+      ],
+      "wordAudio": "audio/words/dog.m4a"
     },
     {
       "id": "cat",
@@ -80,7 +83,8 @@
       "guessable": true,
       "tags": [
         "pets"
-      ]
+      ],
+      "wordAudio": "audio/words/cat.m4a"
     },
     {
       "id": "goat",
@@ -95,7 +99,8 @@
       ],
       "tags": [
         "farm"
-      ]
+      ],
+      "wordAudio": "audio/words/goat.m4a"
     },
     {
       "id": "sheep",
@@ -110,7 +115,8 @@
       ],
       "tags": [
         "farm"
-      ]
+      ],
+      "wordAudio": "audio/words/sheep.m4a"
     },
     {
       "id": "pig",
@@ -122,7 +128,8 @@
       "guessable": true,
       "tags": [
         "farm"
-      ]
+      ],
+      "wordAudio": "audio/words/pig.m4a"
     },
     {
       "id": "horse",
@@ -134,7 +141,8 @@
       "guessable": true,
       "tags": [
         "farm"
-      ]
+      ],
+      "wordAudio": "audio/words/horse.m4a"
     },
     {
       "id": "hen",
@@ -576,6 +584,20 @@
       ]
     }
   ],
+  "prompts": [
+    {
+      "id": "listen",
+      "text": "Listen!"
+    },
+    {
+      "id": "peekaboo",
+      "text": "peekaboo"
+    },
+    {
+      "id": "bye",
+      "text": "Bye bye!"
+    }
+  ],
   "decor": {
     "start": [
       "cow",
@@ -585,7 +607,24 @@
       "cow",
       "duck"
     ],
-    "avatars": ["cow", "duck", "dog", "cat", "sheep", "pig", "horse", "hen", "parrot", "monkey", "elephant", "lion", "frog", "fish", "bee", "teddybear"]
+    "avatars": [
+      "cow",
+      "duck",
+      "dog",
+      "cat",
+      "sheep",
+      "pig",
+      "horse",
+      "hen",
+      "parrot",
+      "monkey",
+      "elephant",
+      "lion",
+      "frog",
+      "fish",
+      "bee",
+      "teddybear"
+    ]
   },
   "scenes": [
     {

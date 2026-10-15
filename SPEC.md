@@ -144,6 +144,7 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 ```
 - Hotspot x, y and r are fractions of the image's width and height, so they scale across devices.
 - `word` is used as the text-to-speech fallback if `wordAudio` is missing.
+- `prompts` lists the spoken prompts (`listen`, `peekaboo`, `bye`) with their `text` and, once built, `audio` (the built-in voice). A voice pack's recording of a prompt wins over `audio`; with neither, the device voice says `text`.
 - `defaults` holds profile settings used until a profile sets its own (currently `peekabooSoundHint`, `bubbleSpeed`, `whoSays` and `whoSaysChoices`).
 - `guessable` marks items that "Who says that?" can use (they also need a `soundAudio`). Currently true for all animals except fish, vehicle horns and sirens (car, bus, train, aeroplane, motorbike, fire truck, boat), bell, clock, phone and door; false for everything else. Set it on new items as they are added.
 - `confusableWith` (optional) lists item ids whose sounds are too alike to show together in "Who says that?". It is read both ways, so a pair needs listing on only one item, and it may name items not yet added. Seeded pairs: goat–sheep, crow–parrot, car–bus, car–motorbike, bus–fire truck.
@@ -157,7 +158,7 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 | Item images | 1024×1024 WebP, about 80–150 KB, single subject, plain or soft background, consistent illustration style. The converter (`npm run assets`) makes the background transparent by flood-filling the pale area connected to the image edges; pale areas inside the subject are kept, even behind a small gap in the outline. Small pale pockets between legs or feet are removed, and so are enclosed holes that match the background colour (inside a cup handle). The converter builds every item listed in `content.json` from `design/style/<id>.png`. |
 | Scene images | 2048×1536 WebP, about 300–500 KB |
 | Style | One locked style prompt (`STYLE.md`) plus the reference image `design/style/style-reference.png`, applied to every image |
-| Word audio | MP3 or AAC, mono, 64 kbps, under 1.5 s, with silence trimmed |
+| Word audio | MP3 or AAC, mono, 64 kbps, under 1.5 s, with silence trimmed. The built-in voice covers item words and prompts. `npm run voice` (macOS only) builds each from `content-src/voice/family/{words,prompts}/<id>.*` (family recordings, which always win) or else `content-src/voice/tts/{words,prompts}/<id>.wav`, with the same processing as the sounds at 64 kbps, into `audio/{words,prompts}/<id>.m4a`, and sets `wordAudio` or the prompt's `audio`. It reports clips over 1.5 s rather than cutting words. `npm run tts` first fills the gaps with Gemini text-to-speech (`GEMINI_API_KEY` in `.env`): for every item and prompt with no family recording, TTS file or audio file yet, it asks for the word "warmly and slowly, in a gentle Indian English accent, as if to a toddler", saves the WAV without ever overwriting a file, waits out rate limits, then runs `npm run voice`. |
 | Sound audio | MP3 or AAC, mono, 96 kbps, under 3 s, normalised to −16 LUFS. The converter (`npm run audio`, macOS only, uses `afconvert`) builds every item with a `soundAudio` path from `content-src/audio/raw/<id>.*`, skipping any start offset set in `content-src/audio/start.json`: it trims silence, cuts clips that are too long with a fade-out, and normalises loudness, with a limiter holding short peaks at −1 dBFS (up to 9 dB of reduction; beyond that it peak-normalises instead). Output is AAC in `.m4a`. |
 | Sources | Images from Gemini (fallback: ChatGPT). Sounds from Freesound, CC0 licence only, with the source recorded in `CREDITS.md`. |
 | Total offline bundle | Under 50 MB |
@@ -223,6 +224,8 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 | 2026-10-15 | M2 profiles: avatar photos are cropped to a 512 px square JPEG (Safari 16 can't encode WebP) and stored as bytes, not Blobs, because WebKit refuses Blobs in IndexedDB in some sessions, including private browsing. |
 | 2026-10-15 | M2 profiles: the backup is a .zip of `manifest.json` (format `toddler-profile`, version 1), `profile.json` and `photos/`. The session clock is not exported. Importing a profile that is already on the device offers replace or keep both. |
 | 2026-10-14 | Item sounds play twice with a 400 ms gap after the word, because single clips (under 3 s) felt too short. Clips stay under 3 s on disk. |
+| 2026-10-16 | Built-in voice: item words and prompts can come from Gemini TTS (`npm run tts`) until family recordings replace them. Family source files always win and are never overwritten. The style instruction is sent as a speech style note, because sent as text before the word the model read the whole instruction aloud. |
+| 2026-10-16 | Prompts moved into `content.json` (`prompts`), so their built-in audio is content, not code. "Bye bye!" on the goodbye screen became prompt `bye`. |
 
 ## 15. Acceptance criteria (v1)
 - Installs to the iPad and iPhone home screens and launches full-screen with no Safari interface.

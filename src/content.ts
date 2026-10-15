@@ -34,11 +34,19 @@ export interface ContentDefaults {
   whoSaysChoices?: WhoSaysChoices;
 }
 
+/** A spoken prompt ("Listen!"). `audio` is the built-in voice; without it the device voice says `text`. */
+export interface Prompt {
+  id: string;
+  text: string;
+  audio?: string;
+}
+
 export interface Content {
   version: number;
   defaults?: ContentDefaults;
   categories: Category[];
   items: Item[];
+  prompts?: Prompt[];
   decor?: { start?: string[]; goodbye?: string[]; avatars?: string[] };
   scenes?: unknown[];
   letters?: unknown[];

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
 import { asset, type Item } from '../content';
-import { speak } from '../audio';
+import { sayBye } from '../audio';
 import { WARNING_MS } from '../session';
 import { MoonFace, PadlockIcon, StarIcon, SunIcon, ZzzIcon } from './icons';
 
@@ -24,7 +24,7 @@ export function FadingSun({ remainingMs }: { remainingMs: number }) {
 export function Goodbye({ decor }: { decor: Item[] }) {
   const [left, right] = decor;
   useEffect(() => {
-    const id = setTimeout(() => void speak('Bye bye!'), 1400);
+    const id = setTimeout(() => void sayBye(), 1400);
     return () => clearTimeout(id);
   }, []);
   return (

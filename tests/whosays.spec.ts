@@ -1,8 +1,9 @@
 import { expect, test, type Page } from '@playwright/test';
-import { spoken, spyOnAudio } from './helpers';
+import { serveContent, spoken, spyOnAudio } from './helpers';
 
 // "Who says that?" smoke tests. content.json is served with the mode's settings
-// forced per test (the service worker is blocked so the route applies).
+// forced per test and without the built-in voice (the service worker is blocked
+// so the route applies).
 test.use({ serviceWorkers: 'block' });
 
 const clips = (page: Page) => page.evaluate(() => (window as unknown as { __clips: number }).__clips);
@@ -11,11 +12,7 @@ async function open(page: Page, defaults: Record<string, unknown> = { whoSays: t
   const errors: string[] = [];
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
   page.on('pageerror', (e) => errors.push(String(e)));
-  await page.route('**/content/content.json', async (route) => {
-    const json = await (await route.fetch()).json();
-    json.defaults = { ...json.defaults, ...defaults };
-    await route.fulfill({ json });
-  });
+  await serveContent(page, (json) => { json.defaults = { ...json.defaults, ...defaults }; });
   await spyOnAudio(page);
   // Test browsers can't all decode AAC: every clip decodes to 0.1 s of silence,
   // so clip playback really starts and can be counted.
