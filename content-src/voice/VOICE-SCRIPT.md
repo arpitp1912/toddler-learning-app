@@ -2,7 +2,7 @@
 
 What to record for the app's built-in voice. Generated from `content.json` by `npm run voice-script`, so rerun that after adding items.
 
-18 of 49 recorded.
+19 of 49 recorded.
 
 ## How to record
 - Say each word warmly and slowly, as if to your toddler. One word per file.
@@ -27,7 +27,7 @@ What to record for the app's built-in voice. Generated from `content.json` by `n
 | pig | `pig` | Recorded |
 | horse | `horse` | Recorded |
 | hen | `hen` | Recorded |
-| crow | `crow` | Device voice |
+| crow | `crow` | Recorded |
 | parrot | `parrot` | Recorded |
 | monkey | `monkey` | Recorded |
 | elephant | `elephant` | Recorded |

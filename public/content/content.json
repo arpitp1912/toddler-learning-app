@@ -171,7 +171,8 @@
       ],
       "tags": [
         "birds"
-      ]
+      ],
+      "wordAudio": "audio/words/crow.m4a"
     },
     {
       "id": "parrot",
