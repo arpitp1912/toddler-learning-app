@@ -144,18 +144,24 @@ async function sayPrompt(key: string, text: string, mine: number) {
   if (mine === seq) await speak(text);
 }
 
+const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** An item's sound, `times` over with the usual gap. Resolves false if interrupted. */
+async function playSound(item: Item, mine: number, times = SOUND_REPEATS): Promise<boolean> {
+  for (let i = 0; i < times && item.soundAudio; i++) {
+    if (i > 0) await wait(SOUND_GAP_MS);
+    if (mine !== seq) return false;
+    if (!(await playClip(item.soundAudio))) break;
+  }
+  return mine === seq;
+}
+
 /** Word, then sound twice with a short gap. Resolves false if interrupted. */
 async function playItem(item: Item, mine: number): Promise<boolean> {
   const recorded = item.wordAudio ? await playClip(item.wordAudio) : false;
   if (mine !== seq) return false;
   if (!recorded) await speak(item.word);
-  for (let i = 0; i < SOUND_REPEATS && item.soundAudio; i++) {
-    if (mine !== seq) return false;
-    if (i > 0) await new Promise((r) => setTimeout(r, SOUND_GAP_MS));
-    if (mine !== seq) return false;
-    if (!(await playClip(item.soundAudio))) break;
-  }
-  return mine === seq;
+  return playSound(item, mine);
 }
 
 /**
@@ -177,6 +183,37 @@ export async function sayPeekaboo(hint?: { item: Item; volume: number }) {
   const mine = seq;
   await sayPrompt('peekaboo', 'peekaboo', mine);
   if (mine === seq && hint?.item.soundAudio) await playClip(hint.item.soundAudio, hint.volume);
+}
+
+/** Who says that?: "Listen!" (voice-pack prompt `listen`), then the target's sound. */
+export async function sayListen(target: Item) {
+  stopAll();
+  const mine = seq;
+  await sayPrompt('listen', 'Listen!', mine);
+  if (mine === seq) await playSound(target, mine);
+}
+
+/** Who says that?: the ear button replays the target's sound. */
+export async function replaySound(target: Item) {
+  stopAll();
+  await playSound(target, seq);
+}
+
+const WRONG_PAUSE_MS = 500;
+
+/**
+ * Who says that?, wrong tap: the tapped item's word and its own sound (once,
+ * to keep the detour short), then the target's sound again.
+ */
+export async function sayWrong(tapped: Item, target: Item) {
+  stopAll();
+  const mine = seq;
+  const recorded = tapped.wordAudio ? await playClip(tapped.wordAudio) : false;
+  if (mine !== seq) return;
+  if (!recorded) await speak(tapped.word);
+  if (!(await playSound(tapped, mine, 1))) return;
+  await wait(WRONG_PAUSE_MS);
+  if (mine === seq) await playSound(target, mine);
 }
 
 /**

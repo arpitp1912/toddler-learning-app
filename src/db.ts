@@ -2,7 +2,7 @@
 // If IndexedDB is unavailable (private mode, old WebKit bug), fall back to
 // in-memory state so playback never breaks.
 import Dexie, { type Table } from 'dexie';
-import type { BubbleSpeed } from './content';
+import type { BubbleSpeed, WhoSaysChoices } from './content';
 
 export type SessionLimit = 0 | 5 | 10 | 15 | 20; // minutes, 0 = off
 
@@ -16,6 +16,8 @@ export interface Profile {
   findIt: boolean;
   peekabooSoundHint?: boolean; // unset = content.json defaults
   bubbleSpeed?: BubbleSpeed;   // unset = content.json defaults
+  whoSays?: boolean;           // "Who says that?" tile, unset = content.json defaults (off)
+  whoSaysChoices?: WhoSaysChoices; // unset = content.json defaults (2)
   voicePacks: string[];
   voiceMode: 'primary' | 'rotate';
   createdAt: number;

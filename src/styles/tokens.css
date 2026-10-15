@@ -74,5 +74,7 @@
   --t-idle: 3s;                /* Peekaboo idle wiggle period */
   --t-burst: 280ms;            /* Bubbles pop burst (300 ms or less) */
   --t-popped-fade: 300ms;      /* popped item fading out after 1.5 s */
+  --t-sparkle: 700ms;          /* Who says that? correct-answer sparkle (under 800 ms) */
+  --t-dim: 300ms;              /* Who says that? other choices fading to 30% */
   --ease-bounce: cubic-bezier(.3, .7, .4, 1);
 }

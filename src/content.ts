@@ -17,14 +17,21 @@ export interface Item {
   soundAudio?: string;
   anim?: 'bounce' | 'wiggle';
   tags?: string[];
+  /** Used by "Who says that?" (needs a soundAudio too). */
+  guessable?: boolean;
+  /** Item ids whose sounds are too alike to show together in "Who says that?". Read both ways. */
+  confusableWith?: string[];
 }
 
 /** Settings a profile falls back to when it has no value of its own. */
 export type BubbleSpeed = 'slow' | 'normal';
+export type WhoSaysChoices = 2 | 3;
 
 export interface ContentDefaults {
   peekabooSoundHint?: boolean;
   bubbleSpeed?: BubbleSpeed;
+  whoSays?: boolean;
+  whoSaysChoices?: WhoSaysChoices;
 }
 
 export interface Content {

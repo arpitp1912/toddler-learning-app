@@ -9,7 +9,9 @@
     "preview": "vite preview --host",
     "assets": "node scripts/convert-images.mjs",
     "audio": "node scripts/convert-audio.mjs",
-    "test": "playwright test"
+    "test": "vitest run && playwright test",
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "dexie": "^4.4.6",
@@ -21,6 +23,7 @@
     "sharp": "^0.35.5",
     "typescript": "^7.0.2",
     "vite": "^8.3.4",
-    "vite-plugin-pwa": "^2.0.0"
+    "vite-plugin-pwa": "^2.0.0",
+    "vitest": "^5.0.4"
   }
 }

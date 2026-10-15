@@ -145,6 +145,15 @@ button {
 .tile[data-tint="butter"] { --tile: var(--tint-butter); --tile-edge: var(--tint-butter-edge); }
 .tile[data-tint="lilac"]  { --tile: var(--tint-lilac);  --tile-edge: var(--tint-lilac-edge); }
 
+/* More than six tiles (with "Who says that?" on): four smaller tiles per row on iPad,
+   so two rows still fit. Each stays over 160 px. */
+@media (orientation: landscape) {
+  .tiles[data-count="7"], .tiles[data-count="8"] { gap: calc(30 * var(--u)); max-width: calc((260 * 4 + 30 * 3) * var(--u)); }
+  .tiles[data-count="7"] .tile, .tiles[data-count="8"] .tile { width: calc(260 * var(--u)); height: calc(250 * var(--u)); }
+  .tiles[data-count="7"] .tile img, .tiles[data-count="8"] .tile img,
+  .tiles[data-count="7"] .tile .icon--tile, .tiles[data-count="8"] .tile .icon--tile { width: calc(215 * var(--u)); height: calc(215 * var(--u)); }
+}
+
 @media (orientation: portrait) {
   .tiles {
     display: grid;
@@ -655,6 +664,119 @@ button {
 
 /* Icons inside fixed-size boxes fill them. */
 .star .icon, .lock-padlock .icon { width: 100%; height: 100%; }
+
+/* ---------- Who says that? ---------- */
+/*
+ * Landscape (iPad frame): two choices at 413 design px are 35% of the width,
+ * and the edge zones narrow to 171 so both fit with no overlap. Three choices
+ * can't reach 35% side by side; they fill the space between the usual edge zones.
+ */
+.whosays { --ws-size: calc(413 * var(--u)); --ws-gap: calc(12 * var(--u)); --ws-ear: max(calc(150 * var(--u)), 120px); }
+.whosays[data-choices="3"] { --ws-size: calc(260 * var(--u)); --ws-gap: calc(20 * var(--u)); }
+.whosays .edge--prev { width: calc(171 * var(--u) + var(--safe-l)); }
+.whosays .edge--next { width: calc(171 * var(--u) + var(--safe-r)); }
+.whosays[data-choices="3"] .edge--prev { width: calc(180 * var(--u) + var(--safe-l)); }
+.whosays[data-choices="3"] .edge--next { width: calc(180 * var(--u) + var(--safe-r)); }
+
+.ws-ear {
+  position: absolute;
+  left: 50%;
+  top: calc(24 * var(--u) + var(--safe-t));
+  width: var(--ws-ear);
+  height: var(--ws-ear);
+  margin-left: calc(var(--ws-ear) / -2);
+  border-radius: 50%;
+  background: var(--c-paper);
+  box-shadow: 0 calc(6 * var(--u)) 0 var(--c-ink-shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+  transition: transform var(--t-press) ease;
+}
+.ws-ear:active { transform: translateY(calc(4 * var(--u))); }
+.ws-ear .icon { width: 72%; height: 72%; }
+.ws-ear--A .icon { animation: bounceA var(--t-bounce) var(--ease-bounce); }
+.ws-ear--B .icon { animation: bounceB var(--t-bounce) var(--ease-bounce); }
+
+.ws-choices {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: max(calc(190 * var(--u)), calc(24 * var(--u) + var(--ws-ear) + 12px));
+  bottom: calc(20 * var(--u));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ws-gap);
+}
+.ws-choice {
+  position: relative;
+  flex: none;
+  width: var(--ws-size);
+  height: var(--ws-size);
+  border-radius: 50%;
+  background: var(--c-paper);
+  box-shadow: 0 calc(8 * var(--u)) 0 var(--c-ink-ghost);
+  transition: opacity var(--t-dim) ease;
+}
+.ws-choice.is-faded { opacity: .3; }
+.ws-choice.is-answer { background: var(--c-butter); }
+.ws-art { position: absolute; inset: 8%; display: block; }
+.ws-art img { width: 100%; height: 100%; object-fit: contain; }
+
+/* Correct answer: eight sparks fly out from the centre and fade. */
+.ws-sparkle { position: absolute; inset: 0; pointer-events: none; }
+.ws-spark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 16%;
+  height: 16%;
+  margin: -8% 0 0 -8%;
+  opacity: 0;
+  animation: spark var(--t-sparkle) ease-out forwards;
+}
+.ws-spark .icon { width: 100%; height: 100%; }
+@keyframes spark {
+  0% { opacity: 0; transform: rotate(var(--a)) translateY(-40%) scale(.3); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: rotate(var(--a)) translateY(-330%) scale(1); }
+}
+
+@media (orientation: portrait) {
+  .whosays { --ws-size: max(calc(170 * var(--u)), 42vw); --ws-gap: calc(12 * var(--u)); --ws-ear: max(calc(110 * var(--u)), 120px); }
+  .whosays[data-choices="3"] { --ws-size: max(calc(112 * var(--u)), 29vw); --ws-gap: calc(8 * var(--u)); }
+  .whosays .edge--prev, .whosays .edge--next,
+  .whosays[data-choices="3"] .edge--prev, .whosays[data-choices="3"] .edge--next { width: 50%; }
+  .ws-ear { top: calc(var(--ft) + 24 * var(--u) + var(--safe-t)); }
+  .ws-choices { top: calc(var(--ft) + 170 * var(--u)); bottom: auto; height: calc(390 * var(--u)); }
+}
+/* Phone landscape: keep the edge zones at 25% of the short edge, as on Cards. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .whosays .edge--prev, .whosays[data-choices="3"] .edge--prev { width: calc(max(180 * var(--u), 25vh) + var(--safe-l)); }
+  .whosays .edge--next, .whosays[data-choices="3"] .edge--next { width: calc(max(180 * var(--u), 25vh) + var(--safe-r)); }
+}
+
+/* Reduced motion: a gentle scale and fade instead of bounce, wiggle and sparkle. */
+@keyframes gentleA { 0% { transform: scale(1); opacity: 1; } 40% { transform: scale(1.04); opacity: .75; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes gentleB { 0% { transform: scale(1); opacity: 1; } 40% { transform: scale(1.04); opacity: .75; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes glow { 0% { opacity: 0; } 30% { opacity: .9; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .ws-art.bounce-A, .ws-art.wiggle-A, .ws-ear--A .icon { animation: gentleA 450ms ease; }
+  .ws-art.bounce-B, .ws-art.wiggle-B, .ws-ear--B .icon { animation: gentleB 450ms ease; }
+  .ws-spark { display: none; }
+  .ws-sparkle::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    box-shadow: 0 0 0 calc(10 * var(--u)) var(--c-honey);
+    animation: glow var(--t-sparkle) ease forwards;
+  }
+  .ws-choices.enter-A, .ws-choices.enter-B { animation: none; }
+  .ws-ear:active { transform: none; opacity: .8; }
+}
 
 /* Neutral ground while content and storage load. */
 .boot { background: var(--c-cream); }

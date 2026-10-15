@@ -2,7 +2,9 @@
   "version": 1,
   "defaults": {
     "peekabooSoundHint": false,
-    "bubbleSpeed": "slow"
+    "bubbleSpeed": "slow",
+    "whoSays": false,
+    "whoSaysChoices": 2
   },
   "categories": [
     {
@@ -39,6 +41,7 @@
       "image": "img/animals/cow.webp",
       "soundAudio": "audio/sounds/cow.m4a",
       "anim": "bounce",
+      "guessable": true,
       "tags": [
         "farm"
       ]
@@ -50,6 +53,7 @@
       "image": "img/animals/duck.webp",
       "soundAudio": "audio/sounds/duck.m4a",
       "anim": "wiggle",
+      "guessable": true,
       "tags": [
         "farm"
       ]
@@ -61,6 +65,7 @@
       "image": "img/animals/dog.webp",
       "soundAudio": "audio/sounds/dog.m4a",
       "anim": "bounce",
+      "guessable": true,
       "tags": [
         "pets"
       ]
@@ -72,6 +77,7 @@
       "image": "img/animals/cat.webp",
       "soundAudio": "audio/sounds/cat.m4a",
       "anim": "wiggle",
+      "guessable": true,
       "tags": [
         "pets"
       ]
@@ -83,6 +89,10 @@
       "image": "img/animals/goat.webp",
       "soundAudio": "audio/sounds/goat.m4a",
       "anim": "bounce",
+      "guessable": true,
+      "confusableWith": [
+        "sheep"
+      ],
       "tags": [
         "farm"
       ]
@@ -94,6 +104,10 @@
       "image": "img/animals/sheep.webp",
       "soundAudio": "audio/sounds/sheep.m4a",
       "anim": "wiggle",
+      "guessable": true,
+      "confusableWith": [
+        "goat"
+      ],
       "tags": [
         "farm"
       ]
@@ -105,6 +119,7 @@
       "image": "img/animals/pig.webp",
       "soundAudio": "audio/sounds/pig.m4a",
       "anim": "bounce",
+      "guessable": true,
       "tags": [
         "farm"
       ]
@@ -116,6 +131,7 @@
       "image": "img/animals/horse.webp",
       "soundAudio": "audio/sounds/horse.m4a",
       "anim": "bounce",
+      "guessable": true,
       "tags": [
         "farm"
       ]
@@ -127,6 +143,7 @@
       "image": "img/animals/hen.webp",
       "soundAudio": "audio/sounds/hen.m4a",
       "anim": "wiggle",
+      "guessable": true,
       "tags": [
         "farm",
         "birds"
@@ -139,6 +156,10 @@
       "image": "img/animals/crow.webp",
       "soundAudio": "audio/sounds/crow.m4a",
       "anim": "wiggle",
+      "guessable": true,
+      "confusableWith": [
+        "parrot"
+      ],
       "tags": [
         "birds"
       ]
@@ -150,6 +171,10 @@
       "image": "img/animals/parrot.webp",
       "soundAudio": "audio/sounds/parrot.m4a",
       "anim": "wiggle",
+      "guessable": true,
+      "confusableWith": [
+        "crow"
+      ],
       "tags": [
         "birds"
       ]
@@ -161,6 +186,7 @@
       "image": "img/animals/monkey.webp",
       "soundAudio": "audio/sounds/monkey.m4a",
       "anim": "bounce",
+      "guessable": true,
       "tags": [
         "wild"
       ]
@@ -172,6 +198,7 @@
       "image": "img/animals/elephant.webp",
       "soundAudio": "audio/sounds/elephant.m4a",
       "anim": "bounce",
+      "guessable": true,
       "tags": [
         "wild"
       ]
@@ -183,6 +210,7 @@
       "image": "img/animals/lion.webp",
       "soundAudio": "audio/sounds/lion.m4a",
       "anim": "bounce",
+      "guessable": true,
       "tags": [
         "wild"
       ]
@@ -194,6 +222,7 @@
       "image": "img/animals/frog.webp",
       "soundAudio": "audio/sounds/frog.m4a",
       "anim": "bounce",
+      "guessable": true,
       "tags": [
         "pond"
       ]
@@ -205,6 +234,7 @@
       "image": "img/animals/fish.webp",
       "soundAudio": "audio/sounds/fish.m4a",
       "anim": "wiggle",
+      "guessable": false,
       "tags": [
         "pond"
       ]
@@ -216,6 +246,7 @@
       "image": "img/animals/bee.webp",
       "soundAudio": "audio/sounds/bee.m4a",
       "anim": "wiggle",
+      "guessable": true,
       "tags": [
         "garden"
       ]
@@ -226,6 +257,11 @@
       "word": "car",
       "image": "img/sounds/car.webp",
       "anim": "wiggle",
+      "guessable": true,
+      "confusableWith": [
+        "bus",
+        "motorbike"
+      ],
       "tags": [
         "vehicles",
         "street"
@@ -237,6 +273,7 @@
       "word": "apple",
       "image": "img/food/apple.webp",
       "anim": "bounce",
+      "guessable": false,
       "tags": [
         "food"
       ]
@@ -247,6 +284,7 @@
       "word": "banana",
       "image": "img/food/banana.webp",
       "anim": "wiggle",
+      "guessable": false,
       "tags": [
         "fruit"
       ]
@@ -257,6 +295,7 @@
       "word": "lemon",
       "image": "img/food/lemon.webp",
       "anim": "bounce",
+      "guessable": false,
       "tags": [
         "fruit"
       ]
@@ -267,6 +306,7 @@
       "word": "watermelon",
       "image": "img/food/watermelon.webp",
       "anim": "wiggle",
+      "guessable": false,
       "tags": [
         "fruit"
       ]
@@ -277,6 +317,7 @@
       "word": "pomegranate",
       "image": "img/food/pomegranate.webp",
       "anim": "bounce",
+      "guessable": false,
       "tags": [
         "fruit"
       ]
@@ -287,6 +328,7 @@
       "word": "orange",
       "image": "img/food/orange.webp",
       "anim": "wiggle",
+      "guessable": false,
       "tags": [
         "fruit"
       ]
@@ -297,6 +339,7 @@
       "word": "papaya",
       "image": "img/food/papaya.webp",
       "anim": "bounce",
+      "guessable": false,
       "tags": [
         "fruit"
       ]
@@ -307,6 +350,7 @@
       "word": "mango",
       "image": "img/food/mango.webp",
       "anim": "wiggle",
+      "guessable": false,
       "tags": [
         "fruit"
       ]
@@ -317,6 +361,7 @@
       "word": "ice cream",
       "image": "img/food/icecream.webp",
       "anim": "bounce",
+      "guessable": false,
       "tags": [
         "food"
       ]
@@ -327,6 +372,7 @@
       "word": "guava",
       "image": "img/food/guava.webp",
       "anim": "wiggle",
+      "guessable": false,
       "tags": [
         "fruit"
       ]
@@ -337,6 +383,7 @@
       "word": "grapes",
       "image": "img/food/grapes.webp",
       "anim": "bounce",
+      "guessable": false,
       "tags": [
         "fruit"
       ]
@@ -347,6 +394,7 @@
       "word": "coconut",
       "image": "img/food/coconut.webp",
       "anim": "wiggle",
+      "guessable": false,
       "tags": [
         "fruit"
       ]
@@ -357,6 +405,7 @@
       "word": "ball",
       "image": "img/things/ball.webp",
       "anim": "wiggle",
+      "guessable": false,
       "tags": [
         "toys"
       ]
@@ -367,6 +416,7 @@
       "word": "book",
       "image": "img/things/book.webp",
       "anim": "bounce",
+      "guessable": false,
       "tags": [
         "home"
       ]
@@ -377,6 +427,7 @@
       "word": "bottle",
       "image": "img/things/bottle.webp",
       "anim": "wiggle",
+      "guessable": false,
       "tags": [
         "home"
       ]
@@ -387,6 +438,7 @@
       "word": "chair",
       "image": "img/things/chair.webp",
       "anim": "bounce",
+      "guessable": false,
       "tags": [
         "home"
       ]
@@ -397,6 +449,7 @@
       "word": "clock",
       "image": "img/things/clock.webp",
       "anim": "wiggle",
+      "guessable": true,
       "tags": [
         "home"
       ]
@@ -407,6 +460,7 @@
       "word": "cup",
       "image": "img/things/cup.webp",
       "anim": "bounce",
+      "guessable": false,
       "tags": [
         "home"
       ]
@@ -417,6 +471,7 @@
       "word": "door",
       "image": "img/things/door.webp",
       "anim": "wiggle",
+      "guessable": true,
       "tags": [
         "home"
       ]
@@ -427,6 +482,7 @@
       "word": "hat",
       "image": "img/things/hat.webp",
       "anim": "bounce",
+      "guessable": false,
       "tags": [
         "home"
       ]
@@ -437,6 +493,7 @@
       "word": "jug",
       "image": "img/things/jug.webp",
       "anim": "wiggle",
+      "guessable": false,
       "tags": [
         "home"
       ]
@@ -447,6 +504,7 @@
       "word": "key",
       "image": "img/things/key.webp",
       "anim": "bounce",
+      "guessable": false,
       "tags": [
         "home"
       ]
@@ -457,6 +515,7 @@
       "word": "phone",
       "image": "img/things/phone.webp",
       "anim": "wiggle",
+      "guessable": true,
       "tags": [
         "home"
       ]
@@ -467,6 +526,7 @@
       "word": "shoe",
       "image": "img/things/shoe.webp",
       "anim": "bounce",
+      "guessable": false,
       "tags": [
         "home"
       ]
@@ -477,6 +537,7 @@
       "word": "spoon",
       "image": "img/things/spoon.webp",
       "anim": "wiggle",
+      "guessable": false,
       "tags": [
         "home"
       ]
@@ -487,6 +548,7 @@
       "word": "teddy bear",
       "image": "img/things/teddybear.webp",
       "anim": "bounce",
+      "guessable": false,
       "tags": [
         "toys"
       ]
@@ -497,6 +559,7 @@
       "word": "toothbrush",
       "image": "img/things/toothbrush.webp",
       "anim": "wiggle",
+      "guessable": false,
       "tags": [
         "home"
       ]
@@ -507,6 +570,7 @@
       "word": "umbrella",
       "image": "img/things/umbrella.webp",
       "anim": "bounce",
+      "guessable": false,
       "tags": [
         "home"
       ]

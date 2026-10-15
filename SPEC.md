@@ -36,7 +36,7 @@ An offline-capable, installable web app for toddlers aged 18–30 months. It rep
 
 | Item | Behaviour |
 |---|---|
-| Profile fields | id, display name (parent-only), avatar photo (from camera or library) or preset animal avatar, age band, enabled modules (home tile ids: category ids plus `peekaboo` and `bubbles`), session limit (minutes), Peekaboo sound hint, Bubbles speed, assigned voice packs and voice mode, created date |
+| Profile fields | id, display name (parent-only), avatar photo (from camera or library) or preset animal avatar, age band, enabled modules (home tile ids: category ids plus `peekaboo`, `bubbles` and `whosays`), session limit (minutes), Peekaboo sound hint, Bubbles speed, Who says that? on or off and its number of choices, assigned voice packs and voice mode, created date |
 | Multiple profiles | Unlimited profiles per device, for example Grandma's iPad holding both children. |
 | Launch | Opens directly into the last-used profile. The child never sees a picker by default. |
 | Switching | Done from the parent area. An optional toddler-facing picker (large avatar faces) can be turned on. |
@@ -67,6 +67,16 @@ An offline-capable, installable web app for toddlers aged 18–30 months. It rep
    - **Session:** from the one-minute warning, no new bubbles appear (the bubbles already showing stay until they leave or are popped). At the limit, the goodbye takes over as usual.
    - **Motion budget:** positions are set with `translate3d` from one `requestAnimationFrame` loop. Only transform and opacity animate (no filters, blur or animated shadows), to hold 60 fps on older iPads.
    - **Home tile:** three bubbles with a duck inside the largest, drawn in SVG. It follows the same `modules` rule as Peekaboo (`bubbles`).
+9. **Who says that? (profile setting, off by default):** a sound, and the child taps who makes it.
+   - **Round:** 2 items side by side (3 if the profile asks for 3). 300 ms after they appear, "Listen!" plays (voice-pack prompt `listen`, else the device voice), then the target item's sound (twice with a short gap, as on Cards).
+   - **Sizes:** with 2 choices each item is at least 35% of the screen width on iPad. 3 choices can't reach 35% side by side, so they share the width between the edge zones (about 22% each, still over 160 px). On iPhone each is at least 25% of the short edge. A large ear button (SVG, top centre, at least 120 px) replays the target sound.
+   - **Right tap:** the item bounces with a gentle sparkle (SVG and CSS, under 800 ms), says its word, then its sound, and the other items fade to 30% opacity. After that, any item can be tapped to hear its name.
+   - **Wrong tap:** that item wiggles and says its own word and its own sound (once), then the target sound plays again. No negative visuals or sounds, and the round goes on.
+   - **Audio:** taps are accepted while audio plays; a new tap stops the current audio first, so audio never overlaps. A tap before "Listen!" starts cancels it.
+   - **Next round:** edge-zone tap or swipe, as on Cards (both directions bring a new round). No auto-advance.
+   - **Items:** only items with `guessable: true` and a `soundAudio`, from the categories enabled for the profile. Targets cycle through the pool before repeating and never repeat in consecutive rounds. The target's position is random, never in the same slot more than twice in a row, and balanced over time. Distractors are guessable items, from a different category than the target where possible. Items listed as `confusableWith` each other never appear in the same round.
+   - **Reduced motion:** a gentle scale and fade replaces the bounce, wiggle and sparkle.
+   - **Home tile:** an ear beside a cow, drawn in SVG. It shows only when the mode is on for the profile, follows the same `modules` rule (`whosays`), and needs at least two usable items.
 
 ## 7. Session control
 - Each profile has a limit of 5, 10, 15 or 20 minutes, or off.
@@ -77,7 +87,7 @@ An offline-capable, installable web app for toddlers aged 18–30 months. It rep
 - Manage profiles: create, edit, delete, export and import.
 - **Voice packs (optional, M5):** see section 8a.
 - Custom photo cards: take a photo, record a word, choose a category. Stored per profile.
-- Settings: modules on or off (including the Peekaboo and Bubbles tiles), session limit, Find-it mode, Peekaboo sound hint, Bubbles speed (slow or normal), toddler-facing profile picker, PIN.
+- Settings: modules on or off (including the Peekaboo and Bubbles tiles), session limit, Find-it mode, Peekaboo sound hint, Bubbles speed (slow or normal), Who says that? (on or off; 2 or 3 choices), toddler-facing profile picker, PIN.
 - Usage log: sessions per day, minutes, most-tapped items. Local only.
 - Setup help: how to install to the home screen and how to enable Guided Access.
 
@@ -94,6 +104,7 @@ A voice pack is a named set of recordings by one adult, such as "Papa", "Mumma" 
 - **Prompts:** recorded once per pack, alongside the item words. If a pack has no recording, the default voice says the prompt.
   - "Where's the…" (Find it): joined to the item word.
   - "Peekaboo" (Peekaboo): said as each new cover appears.
+  - "Listen!" (Who says that?, prompt id `listen`): said at the start of each round, before the target sound.
 - **Microphone:** iOS asks for microphone permission on first use. Show a short explanation screen before the prompt appears.
 
 ## 9. Content model
@@ -102,7 +113,7 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 ```json
 {
   "version": 1,
-  "defaults": { "peekabooSoundHint": false, "bubbleSpeed": "slow" },
+  "defaults": { "peekabooSoundHint": false, "bubbleSpeed": "slow", "whoSays": false, "whoSaysChoices": 2 },
   "categories": [
     { "id": "animals", "icon": "img/cat/animals.webp" }
   ],
@@ -114,6 +125,7 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
       "image": "img/animals/cow.webp",
       "wordAudio": "audio/words/cow.mp3",
       "soundAudio": "audio/sounds/cow.mp3",
+      "guessable": true,
       "tags": ["farm"]
     }
   ],
@@ -132,7 +144,9 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 ```
 - Hotspot x, y and r are fractions of the image's width and height, so they scale across devices.
 - `word` is used as the text-to-speech fallback if `wordAudio` is missing.
-- `defaults` holds profile settings used until a profile sets its own (currently `peekabooSoundHint` and `bubbleSpeed`).
+- `defaults` holds profile settings used until a profile sets its own (currently `peekabooSoundHint`, `bubbleSpeed`, `whoSays` and `whoSaysChoices`).
+- `guessable` marks items that "Who says that?" can use (they also need a `soundAudio`). Currently true for all animals except fish, vehicle horns and sirens (car, bus, train, aeroplane, motorbike, fire truck, boat), bell, clock, phone and door; false for everything else. Set it on new items as they are added.
+- `confusableWith` (optional) lists item ids whose sounds are too alike to show together in "Who says that?". It is read both ways, so a pair needs listing on only one item, and it may name items not yet added. Seeded pairs: goat–sheep, crow–parrot, car–bus, car–motorbike, bus–fire truck.
 
 **v1 content target:** 40 animals, 20 everyday sounds (vehicles, household, nature), 5 scenes, counting objects for 1–5, 26 letter–object pairs. Letter objects reuse items wherever possible.
 
@@ -193,6 +207,11 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 | 2026-10-15 | Bubbles: bubbles may pass under the parent-gate corner (top right). Avoiding it as well as the home button leaves too little width on iPhone portrait for even one bubble. A single tap there reaches the gate, not the bubble, but the bubble keeps rising into reach. |
 | 2026-10-15 | Bubbles: the screen starts filled (bubbles spread up the screen) rather than empty, including when opened during the one-minute warning. Only new bubbles stop during the warning. |
 | 2026-10-15 | Bubbles, reduced motion: the replacement bubble fades in once the popped item has faded (about 1.8 s), not at 0.5 s, so the old item and the new bubble never overlap in the same spot. |
+| 2026-10-15 | Who says that? added as a mode tile (branch `feature/who-says`), off by default. With it on, the home has 7 tiles; nothing enforces the 4–5 in section 6 (see 2026-10-13), so on iPad landscape more than 6 tiles switch to 4 smaller tiles per row (260 design px, still over 160 px) to fit in two rows. |
+| 2026-10-15 | Who says that?: 3 choices can't each be 35% of the iPad width side by side (105%), so they share the space between the edge zones (about 22% each). With 2 choices the edge zones narrow slightly (171 design px) so both items reach 35% with no overlap. |
+| 2026-10-15 | Who says that?: the target sound plays twice after "Listen!" and on the ear button, as items do elsewhere (2026-10-14). On a wrong tap the tapped item's own sound plays once, to keep the detour short before the target sound returns. |
+| 2026-10-15 | Who says that?: after the right answer, the faded items stay tappable and just say their own word and sound (every tap responds); the target replays its celebration. |
+| 2026-10-15 | Who says that?: only animals have sound clips today, so the pool is the 16 animals other than fish. Car, clock, phone and door are marked guessable but join once their sounds exist. Bus, train, aeroplane, motorbike, fire truck, boat and bell aren't in the content yet; the bus–fire truck pair has to be added to one of those items when they arrive. |
 | 2026-10-14 | Item sounds play twice with a 400 ms gap after the word, because single clips (under 3 s) felt too short. Clips stay under 3 s on disk. |
 
 ## 15. Acceptance criteria (v1)

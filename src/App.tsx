@@ -8,15 +8,23 @@ import { Home } from './components/Home';
 import { Cards } from './components/Cards';
 import { Peekaboo } from './components/Peekaboo';
 import { Bubbles } from './components/Bubbles';
+import { WhoSays } from './components/WhoSays';
+import { guessPool } from './rounds';
 import { FadingSun, Goodbye, Lock } from './components/SessionEnd';
 import { ParentCheck, ParentCorner } from './components/ParentGate';
 import { ParentPanel } from './components/ParentPanel';
 
-type View = { name: 'home' } | { name: 'cards'; categoryId: string } | { name: 'peekaboo' } | { name: 'bubbles' };
+type View =
+  | { name: 'home' }
+  | { name: 'cards'; categoryId: string }
+  | { name: 'peekaboo' }
+  | { name: 'bubbles' }
+  | { name: 'whosays' };
 
 /** Home tile ids for the modes in `profile.modules`, alongside category ids. */
 const PEEKABOO = 'peekaboo';
 const BUBBLES = 'bubbles';
+const WHO_SAYS = 'whosays';
 type ParentStep = null | 'check' | 'panel';
 
 function decorItems(content: Content, key: 'start' | 'goodbye'): Item[] {
@@ -69,6 +77,13 @@ export function App() {
   const soundHint = profile?.peekabooSoundHint ?? content?.defaults?.peekabooSoundHint ?? false;
   const bubbleSpeed = profile?.bubbleSpeed ?? content?.defaults?.bubbleSpeed ?? 'slow';
 
+  // Who says that?: off unless the profile (or content defaults) turns it on, and
+  // only with at least two guessable items with sounds in the enabled categories.
+  const guessItems = useMemo(() => guessPool(mixedItems), [mixedItems]);
+  const whoSaysOn =
+    modeOn(WHO_SAYS) && (profile?.whoSays ?? content?.defaults?.whoSays ?? false) && guessItems.length >= 2;
+  const whoSaysChoices = profile?.whoSaysChoices ?? content?.defaults?.whoSaysChoices ?? 2;
+
   const start = () => {
     unlockAudio();
     void requestPersistence();
@@ -120,12 +135,15 @@ export function App() {
           <Peekaboo items={mixedItems} soundHint={soundHint} onHome={goHome} />
         ) : view.name === 'bubbles' && bubblesOn ? (
           <Bubbles items={mixedItems} speed={bubbleSpeed} spawning={!warning} onHome={goHome} />
+        ) : view.name === 'whosays' && whoSaysOn ? (
+          <WhoSays key={whoSaysChoices} items={guessItems} choices={whoSaysChoices} onHome={goHome} />
         ) : (
           <Home
             categories={categories}
             onOpen={(c) => setView({ name: 'cards', categoryId: c.id })}
             onPeekaboo={peekabooOn ? () => setView({ name: 'peekaboo' }) : undefined}
             onBubbles={bubblesOn ? () => setView({ name: 'bubbles' }) : undefined}
+            onWhoSays={whoSaysOn ? () => setView({ name: 'whosays' }) : undefined}
           />
         );
   }

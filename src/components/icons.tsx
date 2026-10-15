@@ -150,3 +150,63 @@ export const BubblesIcon = () => (
     <TileBubble cx={150} cy={160} r={17} />
   </svg>
 );
+
+// An ear with sound arriving from the left. Used by the replay button and the tile.
+const Ear = ({ fill = 'var(--tint-peach)' }: { fill?: string }) => (
+  <>
+    <path
+      d="M66 14C90 14 104 32 104 54C104 72 94 80 88 88C82 96 82 108 68 108C56 108 52 98 52 90C52 82 46 78 44 70C40 60 40 50 42 42C46 24 56 14 66 14Z"
+      fill={fill}
+      stroke="var(--c-ink)"
+      stroke-width="5"
+      stroke-linejoin="round"
+    />
+    <path d="M60 76C55 66 58 54 67 50C77 46 85 54 83 64C81 72 73 74 73 84" fill="none" stroke="var(--c-ink)" stroke-width="6" stroke-linecap="round" />
+  </>
+);
+
+/** Who says that?: the replay button. */
+export const EarIcon = () => (
+  <svg {...base} viewBox="0 0 120 120">
+    <g fill="none" stroke="var(--c-terracotta)" stroke-width="6" stroke-linecap="round">
+      <path d="M28 46q-8 14 0 28" />
+      <path d="M14 36q-16 24 0 48" />
+    </g>
+    <Ear />
+  </svg>
+);
+
+/** Home tile for "Who says that?": a cow, its sound, and an ear listening. */
+export const WhoSaysIcon = () => (
+  <svg {...base} class="icon icon--tile" viewBox="0 0 200 200">
+    {/* Cow face */}
+    <g transform="translate(-14 0)">
+      <ellipse cx="34" cy="96" rx="16" ry="9" transform="rotate(-24 34 96)" fill="var(--c-paper)" stroke="var(--c-ink)" stroke-width="4" />
+      <ellipse cx="122" cy="96" rx="16" ry="9" transform="rotate(24 122 96)" fill="var(--c-paper)" stroke="var(--c-ink)" stroke-width="4" />
+      <path d="M52 84q-4-14 6-18" fill="none" stroke="var(--c-honey)" stroke-width="7" stroke-linecap="round" />
+      <path d="M104 84q4-14-6-18" fill="none" stroke="var(--c-honey)" stroke-width="7" stroke-linecap="round" />
+      <rect x="44" y="80" width="68" height="92" rx="32" fill="var(--c-paper)" stroke="var(--c-ink)" stroke-width="4" />
+      <path d="M48 104q4-18 22-20q-2 16-22 20z" fill="var(--c-ink)" />
+      <circle cx="66" cy="114" r="5" fill="var(--c-ink)" />
+      <circle cx="92" cy="114" r="5" fill="var(--c-ink)" />
+      <ellipse cx="78" cy="150" rx="30" ry="20" fill="var(--tint-peach-edge)" stroke="var(--c-ink)" stroke-width="4" />
+      <ellipse cx="68" cy="150" rx="4" ry="6" fill="var(--c-ink)" />
+      <ellipse cx="88" cy="150" rx="4" ry="6" fill="var(--c-ink)" />
+    </g>
+    {/* Sound travelling up to the ear */}
+    <g fill="none" stroke="var(--c-terracotta)" stroke-width="5" stroke-linecap="round">
+      <path d="M128 122q10-8 4-20" />
+      <path d="M140 130q20-14 8-38" />
+    </g>
+    <g transform="translate(116 8) scale(.68)">
+      <Ear fill="var(--c-paper)" />
+    </g>
+  </svg>
+);
+
+/** One sparkle point for the correct-answer burst. */
+export const SparkIcon = () => (
+  <svg {...base} viewBox="0 0 24 24">
+    <path d="M12 1l2.6 8.4L23 12l-8.4 2.6L12 23l-2.6-8.4L1 12l8.4-2.6z" fill="var(--c-sun)" />
+  </svg>
+);
