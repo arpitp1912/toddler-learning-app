@@ -520,7 +520,8 @@
     "goodbye": [
       "cow",
       "duck"
-    ]
+    ],
+    "avatars": ["cow", "duck", "dog", "cat", "sheep", "pig", "horse", "hen", "parrot", "monkey", "elephant", "lion", "frog", "fish", "bee", "teddybear"]
   },
   "scenes": [
     {

@@ -52,6 +52,8 @@
   --c-parent-text: #1F1E1D;
   --c-parent-muted: #6B6A68;
   --c-parent-line: #E4DFD3;
+  --c-parent-danger: #B3261E;  /* errors, delete */
+  --c-parent-ok: #2F6B3A;      /* confirmations, switches on */
 
   /* Radii (design px, multiply by --u) */
   --r-tile: 56;

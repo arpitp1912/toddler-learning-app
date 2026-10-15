@@ -133,6 +133,7 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 - Hotspot x, y and r are fractions of the image's width and height, so they scale across devices.
 - `word` is used as the text-to-speech fallback if `wordAudio` is missing.
 - `defaults` holds profile settings used until a profile sets its own (currently `peekabooSoundHint` and `bubbleSpeed`).
+- `decor` lists item ids used as decoration: `start` and `goodbye` for those screens, and `avatars` for the preset profile pictures in the profile editor.
 
 **v1 content target:** 40 animals, 20 everyday sounds (vehicles, household, nature), 5 scenes, counting objects for 1–5, 26 letter–object pairs. Letter objects reuse items wherever possible.
 
@@ -193,6 +194,13 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 | 2026-10-15 | Bubbles: bubbles may pass under the parent-gate corner (top right). Avoiding it as well as the home button leaves too little width on iPhone portrait for even one bubble. A single tap there reaches the gate, not the bubble, but the bubble keeps rising into reach. |
 | 2026-10-15 | Bubbles: the screen starts filled (bubbles spread up the screen) rather than empty, including when opened during the one-minute warning. Only new bubbles stop during the warning. |
 | 2026-10-15 | Bubbles, reduced motion: the replacement bubble fades in once the popped item has faded (about 1.8 s), not at 0.5 s, so the old item and the new bubble never overlap in the same spot. |
+| 2026-10-15 | M2 profiles: the toddler picker and the parent PIN are device-wide settings, not per profile, since they decide who plays and who gets into the parent area on that device. |
+| 2026-10-15 | M2 profiles: the picker appears after tap to start (the parent's tap still unlocks audio), only when it is on and the device has two or more profiles. Choosing a locked profile shows its lock screen. |
+| 2026-10-15 | M2 profiles: each profile keeps its own session clock and lock. Switching from the parent area returns to tap to start for the new profile. |
+| 2026-10-15 | M2 profiles: a profile with every home tile on stores no tile list, so tiles added by later content updates appear for it automatically. |
+| 2026-10-15 | M2 profiles: a forgotten PIN can be removed by answering a two-digit sum (for example 37 + 48), which keeps out toddlers and young siblings without locking the parent out. Three wrong PIN tries close the gate. |
+| 2026-10-15 | M2 profiles: avatar photos are cropped to a 512 px square JPEG (Safari 16 can't encode WebP) and stored as bytes, not Blobs, because WebKit refuses Blobs in IndexedDB in some sessions, including private browsing. |
+| 2026-10-15 | M2 profiles: the backup is a .zip of `manifest.json` (format `toddler-profile`, version 1), `profile.json` and `photos/`. The session clock is not exported. Importing a profile that is already on the device offers replace or keep both. |
 | 2026-10-14 | Item sounds play twice with a 400 ms gap after the word, because single clips (under 3 s) felt too short. Clips stay under 3 s on disk. |
 
 ## 15. Acceptance criteria (v1)

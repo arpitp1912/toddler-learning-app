@@ -1,6 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from 'preact/hooks';
-import { itemById, itemsIn, loadContent, SUPPORTED_MODULES, type Category, type Content, type Item } from './content';
-import { loadProfile, requestPersistence, saveProfile, type Profile, type SessionLimit } from './db';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { avatarItems, itemById, itemsIn, loadContent, SUPPORTED_MODULES, type Category, type Content, type Item } from './content';
+import {
+  deleteProfile, listProfiles, loadDeviceSettings, loadProfile, putImported, requestPersistence,
+  saveDeviceSettings, setLastProfile, type DeviceSettings, type Profile,
+} from './db';
+import type { ProfileBundle } from './backup';
+import { forgetPhotoUrl } from './photos';
 import { stopAll, unlockAudio } from './audio';
 import { useSession, WARNING_MS } from './session';
 import { TapToStart } from './components/TapToStart';
@@ -11,6 +16,7 @@ import { Bubbles } from './components/Bubbles';
 import { FadingSun, Goodbye, Lock } from './components/SessionEnd';
 import { ParentCheck, ParentCorner } from './components/ParentGate';
 import { ParentPanel } from './components/ParentPanel';
+import { ProfilePicker } from './components/ProfilePicker';
 
 type View = { name: 'home' } | { name: 'cards'; categoryId: string } | { name: 'peekaboo' } | { name: 'bubbles' };
 
@@ -29,18 +35,41 @@ export function App() {
   const [content, setContent] = useState<Content | null>(null);
   const [failed, setFailed] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [device, setDevice] = useState<DeviceSettings>({ picker: false, pin: null });
   const [view, setView] = useState<View>({ name: 'home' });
   const [parent, setParent] = useState<ParentStep>(null);
+  // Toddler picker showing (after tap to start), and a pick waiting for its profile's session to load.
+  const [picking, setPicking] = useState(false);
+  const startOnLoad = useRef(false);
 
   const session = useSession(profile, parent !== null);
 
+  const refreshProfiles = useCallback(() => listProfiles().then(setProfiles), []);
+
   useEffect(() => {
-    loadContent().then(setContent, (err) => {
-      console.error('[content]', err);
-      setFailed(true);
-    });
-    loadProfile().then(setProfile);
+    loadContent().then(
+      async (c) => {
+        setContent(c);
+        setProfile(await loadProfile(avatarItems(c)[0]?.id ?? ''));
+        await refreshProfiles();
+      },
+      (err) => {
+        console.error('[content]', err);
+        setFailed(true);
+      },
+    );
+    loadDeviceSettings().then(setDevice);
   }, []);
+
+  // A child picked a different face: start play once that profile's session has loaded.
+  useEffect(() => {
+    if (!startOnLoad.current) return;
+    if (session.phase === 'start') {
+      startOnLoad.current = false;
+      session.start();
+    } else if (session.phase === 'locked') startOnLoad.current = false;
+  }, [session.phase]);
 
   const categories = useMemo<Category[]>(() => {
     if (!content || !profile) return [];
@@ -69,11 +98,26 @@ export function App() {
   const soundHint = profile?.peekabooSoundHint ?? content?.defaults?.peekabooSoundHint ?? false;
   const bubbleSpeed = profile?.bubbleSpeed ?? content?.defaults?.bubbleSpeed ?? 'slow';
 
+  const showPicker = device.picker && profiles.length > 1;
   const start = () => {
     unlockAudio();
     void requestPersistence();
     setView({ name: 'home' });
-    session.start();
+    if (showPicker) setPicking(true);
+    else session.start();
+  };
+  const switchTo = (p: Profile) => {
+    stopAll();
+    setView({ name: 'home' });
+    setPicking(false);
+    void setLastProfile(p.id);
+    setProfile(p);
+  };
+  const pick = (p: Profile) => {
+    setPicking(false);
+    if (p.id === profile?.id) return session.start();
+    startOnLoad.current = true;
+    switchTo(p);
   };
   const goHome = () => {
     stopAll();
@@ -84,11 +128,37 @@ export function App() {
   const closeParent = useCallback(() => setParent(null), []);
   const passCheck = useCallback(() => setParent('panel'), []);
 
-  const setLimit = (sessionLimit: SessionLimit) => {
-    if (!profile) return;
-    const next = { ...profile, sessionLimit };
-    setProfile(next);
-    void saveProfile(next);
+  const changeDevice = (next: DeviceSettings) => {
+    setDevice(next);
+    void saveDeviceSettings(next);
+  };
+  const pinForgotten = useCallback(() => {
+    setDevice((d) => {
+      const next = { ...d, pin: null };
+      void saveDeviceSettings(next);
+      return next;
+    });
+    setParent('panel');
+  }, []);
+
+  const profileSaved = (p: Profile) => {
+    if (p.id === profile?.id) setProfile(p);
+    void refreshProfiles();
+  };
+  const profileDeleted = async (p: Profile) => {
+    if (p.avatarPhoto) forgetPhotoUrl(p.avatarPhoto);
+    await deleteProfile(p.id);
+    const rest = await listProfiles();
+    setProfiles(rest);
+    if (p.id === profile?.id && rest[0]) switchTo(rest[0]);
+  };
+  const imported = async ({ profile: p, photos }: ProfileBundle) => {
+    const old = profiles.find((x) => x.id === p.id);
+    if (old?.avatarPhoto) forgetPhotoUrl(old.avatarPhoto);
+    await putImported(p, photos);
+    // Replacing the profile that is playing: show its imported settings straight away.
+    if (p.id === profile?.id) setProfile(p);
+    await refreshProfiles();
   };
 
   if (failed) {
@@ -104,7 +174,12 @@ export function App() {
   let screen;
   switch (session.phase) {
     case 'start':
-      screen = <TapToStart decor={decorItems(content, 'start')} onStart={start} />;
+      screen =
+        picking && showPicker ? (
+          <ProfilePicker profiles={profiles} content={content} onPick={pick} />
+        ) : (
+          <TapToStart decor={decorItems(content, 'start')} onStart={start} />
+        );
       break;
     case 'goodbye':
       screen = <Goodbye decor={decorItems(content, 'goodbye')} />;
@@ -135,10 +210,15 @@ export function App() {
       {screen}
       {warning && <FadingSun remainingMs={session.remainingMs!} />}
       {session.phase !== 'goodbye' && <ParentCorner onOpen={openGate} showHint={session.phase === 'locked'} />}
-      {parent === 'check' && <ParentCheck onPass={passCheck} onCancel={closeParent} />}
+      {parent === 'check' && (
+        <ParentCheck pin={device.pin} onPass={passCheck} onCancel={closeParent} onPinForgotten={pinForgotten} />
+      )}
       {parent === 'panel' && (
         <ParentPanel
+          content={content}
           profile={profile}
+          profiles={profiles}
+          device={device}
           locked={session.phase === 'locked' || session.phase === 'goodbye'}
           elapsedMs={session.elapsedMs}
           onBack={closeParent}
@@ -153,7 +233,11 @@ export function App() {
             setParent(null);
             session.endNow();
           }}
-          onLimit={setLimit}
+          onSwitch={switchTo}
+          onSaved={profileSaved}
+          onDelete={profileDeleted}
+          onImport={imported}
+          onDevice={changeDevice}
         />
       )}
     </>

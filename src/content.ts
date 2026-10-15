@@ -32,7 +32,7 @@ export interface Content {
   defaults?: ContentDefaults;
   categories: Category[];
   items: Item[];
-  decor?: { start?: string[]; goodbye?: string[] };
+  decor?: { start?: string[]; goodbye?: string[]; avatars?: string[] };
   scenes?: unknown[];
   letters?: unknown[];
   counting?: unknown[];
@@ -56,3 +56,11 @@ export const itemsIn = (content: Content, categoryId: string) =>
   content.items.filter((i) => i.category === categoryId);
 
 export const itemById = (content: Content, id: string) => content.items.find((i) => i.id === id);
+
+/** Preset profile avatars: `decor.avatars`, or the first category's items if that is missing. */
+export function avatarItems(content: Content): Item[] {
+  const listed = content.decor?.avatars?.map((id) => itemById(content, id)).filter((i): i is Item => !!i);
+  if (listed?.length) return listed;
+  const first = content.categories[0];
+  return first ? itemsIn(content, first.id) : content.items.slice(0, 12);
+}

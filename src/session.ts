@@ -13,7 +13,11 @@ const SAVE_EVERY_MS = 5_000;
 
 /** `paused` stops the clock while the parent area is open. */
 export function useSession(profile: Profile | null, paused: boolean) {
-  const [phase, setPhase] = useState<Phase>('boot');
+  const [state, setPhase] = useState<Phase>('boot');
+  // Which profile `state` was loaded for. Until the new profile's session has
+  // loaded after a switch, the phase reads as 'boot' so nothing stale runs.
+  const [readyFor, setReadyFor] = useState<string | null>(null);
+  const phase: Phase = profile && readyFor === profile.id ? state : 'boot';
   const [elapsedMs, setElapsedMs] = useState(0);
   const elapsedRef = useRef(0);
   elapsedRef.current = elapsedMs;
@@ -27,18 +31,28 @@ export function useSession(profile: Profile | null, paused: boolean) {
     void saveSession({ profileId: profile.id, elapsedMs: elapsedRef.current, locked: lockedRef.current, updatedAt: Date.now() });
   }, [profile]);
 
-  // Boot: restore lock state so a reload can't bypass it.
+  // Boot: restore lock state so a reload can't bypass it. Runs again when the
+  // parent switches profile; each profile keeps its own clock and lock.
   useEffect(() => {
     if (!profile) return;
+    const profileId = profile.id;
     let cancelled = false;
-    loadSession(profile.id).then((s) => {
+    let loaded = false;
+    loadSession(profileId).then((s) => {
       if (cancelled) return;
       const stale = !s.locked && Date.now() - s.updatedAt > STALE_MS;
       lockedRef.current = s.locked;
-      setElapsedMs(stale ? 0 : s.elapsedMs);
+      elapsedRef.current = stale ? 0 : s.elapsedMs;
+      setElapsedMs(elapsedRef.current);
       setPhase(s.locked ? 'locked' : 'start');
+      setReadyFor(profileId);
+      loaded = true;
     });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+      // Leaving this profile: keep its clock and lock as they were.
+      if (loaded) void saveSession({ profileId, elapsedMs: elapsedRef.current, locked: lockedRef.current, updatedAt: Date.now() });
+    };
   }, [profile?.id]);
 
   // Play clock: only counts while the page is visible; sleep gaps are not counted.
