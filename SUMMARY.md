@@ -1,6 +1,6 @@
 # Branch summary: `feature/who-says`
 
-This branch was created from `main`, which already has Peekaboo and Bubbles. It adds the "Who says that?" mode, and `feature/m2-profiles` (profiles, export/import, toddler picker, PIN) is merged in so both can be tested together. Neither is merged into main.
+This branch was created from `main`, which already had Peekaboo and Bubbles. It adds the "Who says that?" mode, and `feature/m2-profiles` (profiles, export/import, toddler picker, PIN) was merged in so both could be tested together. Both are now merged into `main` (2026-10-15).
 
 # Who says that?
 
