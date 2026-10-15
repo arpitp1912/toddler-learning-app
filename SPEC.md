@@ -36,7 +36,7 @@ An offline-capable, installable web app for toddlers aged 18–30 months. It rep
 
 | Item | Behaviour |
 |---|---|
-| Profile fields | id, display name (parent-only), avatar photo (from camera or library) or preset animal avatar, age band, enabled modules (home tile ids: category ids plus `peekaboo`, `bubbles` and `whosays`), session limit (minutes), Peekaboo sound hint, Bubbles speed, Who says that? on or off and its number of choices, assigned voice packs and voice mode, created date |
+| Profile fields | id, display name (parent-only), avatar photo (from camera or library) or preset animal avatar, age band, enabled modules (home tile ids: category ids plus `peekaboo` and `bubbles`), session limit (minutes), Peekaboo sound hint, Bubbles speed, Who says that? on or off and its number of choices, assigned voice packs and voice mode, created date |
 | Multiple profiles | Unlimited profiles per device, for example Grandma's iPad holding both children. |
 | Launch | Opens directly into the last-used profile. The child never sees a picker by default. |
 | Switching | Done from the parent area. An optional toddler-facing picker (large avatar faces) can be turned on. |
@@ -76,7 +76,7 @@ An offline-capable, installable web app for toddlers aged 18–30 months. It rep
    - **Next round:** edge-zone tap or swipe, as on Cards (both directions bring a new round). No auto-advance.
    - **Items:** only items with `guessable: true` and a `soundAudio`, from the categories enabled for the profile. Targets cycle through the pool before repeating and never repeat in consecutive rounds. The target's position is random, never in the same slot more than twice in a row, and balanced over time. Distractors are guessable items, from a different category than the target where possible. Items listed as `confusableWith` each other never appear in the same round.
    - **Reduced motion:** a gentle scale and fade replaces the bounce, wiggle and sparkle.
-   - **Home tile:** an ear beside a cow, drawn in SVG. It shows only when the mode is on for the profile, follows the same `modules` rule (`whosays`), and needs at least two usable items.
+   - **Home tile:** an ear beside a cow, drawn in SVG. It shows only when the mode is on for the profile (its own switch, not the `modules` list) and there are at least two usable items.
 
 ## 7. Session control
 - Each profile has a limit of 5, 10, 15 or 20 minutes, or off.
@@ -147,6 +147,7 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 - `defaults` holds profile settings used until a profile sets its own (currently `peekabooSoundHint`, `bubbleSpeed`, `whoSays` and `whoSaysChoices`).
 - `guessable` marks items that "Who says that?" can use (they also need a `soundAudio`). Currently true for all animals except fish, vehicle horns and sirens (car, bus, train, aeroplane, motorbike, fire truck, boat), bell, clock, phone and door; false for everything else. Set it on new items as they are added.
 - `confusableWith` (optional) lists item ids whose sounds are too alike to show together in "Who says that?". It is read both ways, so a pair needs listing on only one item, and it may name items not yet added. Seeded pairs: goat–sheep, crow–parrot, car–bus, car–motorbike, bus–fire truck.
+- `decor` lists item ids used as decoration: `start` and `goodbye` for those screens, and `avatars` for the preset profile pictures in the profile editor.
 
 **v1 content target:** 40 animals, 20 everyday sounds (vehicles, household, nature), 5 scenes, counting objects for 1–5, 26 letter–object pairs. Letter objects reuse items wherever possible.
 
@@ -212,7 +213,15 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 | 2026-10-15 | Who says that?: the target sound plays twice after "Listen!" and on the ear button, as items do elsewhere (2026-10-14). On a wrong tap the tapped item's own sound plays once, to keep the detour short before the target sound returns. |
 | 2026-10-15 | Who says that?: after the right answer, the faded items stay tappable and just say their own word and sound (every tap responds); the target replays its celebration. |
 | 2026-10-15 | Who says that?: only animals have sound clips today, so the pool is the 16 animals other than fish. Car, clock, phone and door are marked guessable but join once their sounds exist. Bus, train, aeroplane, motorbike, fire truck, boat and bell aren't in the content yet; the bus–fire truck pair has to be added to one of those items when they arrive. |
-| 2026-10-15 | Who says that? is on by default (`defaults.whoSays: true`), changed from off after first local testing. A profile can still turn it off once the profile editor (M2) has the switch, or through its `modules` list. |
+| 2026-10-15 | Who says that? is on by default (`defaults.whoSays: true`), changed from off after first local testing. A profile can turn it off in the profile editor. |
+| 2026-10-15 | Merging M2 into Who says that?: the mode's own `whoSays` switch decides whether its tile shows, not the `modules` list, because tile lists saved by the M2 editor before the mode existed don't include it. The editor shows it with the other home tiles, and offers 2 or 3 pictures while it is on. Backups carry both settings. |
+| 2026-10-15 | M2 profiles: the toddler picker and the parent PIN are device-wide settings, not per profile, since they decide who plays and who gets into the parent area on that device. |
+| 2026-10-15 | M2 profiles: the picker appears after tap to start (the parent's tap still unlocks audio), only when it is on and the device has two or more profiles. Choosing a locked profile shows its lock screen. |
+| 2026-10-15 | M2 profiles: each profile keeps its own session clock and lock. Switching from the parent area returns to tap to start for the new profile. |
+| 2026-10-15 | M2 profiles: a profile with every home tile on stores no tile list, so tiles added by later content updates appear for it automatically. |
+| 2026-10-15 | M2 profiles: a forgotten PIN can be removed by answering a two-digit sum (for example 37 + 48), which keeps out toddlers and young siblings without locking the parent out. Three wrong PIN tries close the gate. |
+| 2026-10-15 | M2 profiles: avatar photos are cropped to a 512 px square JPEG (Safari 16 can't encode WebP) and stored as bytes, not Blobs, because WebKit refuses Blobs in IndexedDB in some sessions, including private browsing. |
+| 2026-10-15 | M2 profiles: the backup is a .zip of `manifest.json` (format `toddler-profile`, version 1), `profile.json` and `photos/`. The session clock is not exported. Importing a profile that is already on the device offers replace or keep both. |
 | 2026-10-14 | Item sounds play twice with a 400 ms gap after the word, because single clips (under 3 s) felt too short. Clips stay under 3 s on disk. |
 
 ## 15. Acceptance criteria (v1)

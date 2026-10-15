@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { TwoFingerIcon } from './icons';
+import { ForgotPin, PinCheck } from './Pin';
 
 const HOLD_MS = 3000;
 const CHECK_TIMEOUT_MS = 20_000;
+const PIN_TIMEOUT_MS = 60_000;
 const WORDS = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
 
 /**
@@ -63,8 +65,40 @@ export function ParentCorner({ onOpen, showHint }: { onOpen: () => void; showHin
   );
 }
 
-/** Adult check after the hold: "Tap seven" on a shuffled 1–9 pad. A wrong tap closes it. */
-export function ParentCheck({ onPass, onCancel }: { onPass: () => void; onCancel: () => void }) {
+/**
+ * Adult check after the hold. With a PIN set, the PIN pad (with a harder
+ * "forgot PIN" check that removes it). Otherwise "Tap seven" on a shuffled pad.
+ */
+export function ParentCheck({ pin, onPass, onCancel, onPinForgotten }: {
+  pin: string | null;
+  onPass: () => void;
+  onCancel: () => void;
+  /** The adult passed the forgot-PIN check: remove the PIN and let them in. */
+  onPinForgotten: () => void;
+}) {
+  const [forgot, setForgot] = useState(false);
+  useEffect(() => {
+    const id = setTimeout(onCancel, pin ? PIN_TIMEOUT_MS : CHECK_TIMEOUT_MS);
+    return () => clearTimeout(id);
+  }, [onCancel, pin, forgot]);
+
+  return (
+    <div class="parent" role="dialog" aria-modal="true" aria-labelledby="check-title">
+      <div class="parent-wrap check">
+        {!pin ? (
+          <TapNumber onPass={onPass} onCancel={onCancel} />
+        ) : forgot ? (
+          <ForgotPin onPass={onPinForgotten} onCancel={() => setForgot(false)} />
+        ) : (
+          <PinCheck pin={pin} onPass={onPass} onCancel={onCancel} onForgot={() => setForgot(true)} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** "Tap seven" on a shuffled 1–9 pad. A wrong tap closes it. */
+function TapNumber({ onPass, onCancel }: { onPass: () => void; onCancel: () => void }) {
   const { target, order } = useMemo(() => {
     const nums = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     for (let i = nums.length - 1; i > 0; i--) {
@@ -74,25 +108,18 @@ export function ParentCheck({ onPass, onCancel }: { onPass: () => void; onCancel
     return { target: 1 + Math.floor(Math.random() * 9), order: nums };
   }, []);
 
-  useEffect(() => {
-    const id = setTimeout(onCancel, CHECK_TIMEOUT_MS);
-    return () => clearTimeout(id);
-  }, [onCancel]);
-
   return (
-    <div class="parent" role="dialog" aria-modal="true" aria-labelledby="check-title">
-      <div class="parent-wrap check">
-        <p class="parent-muted">For grown-ups</p>
-        <h1 id="check-title" class="check-prompt">Tap {WORDS[target - 1]}</h1>
-        <div class="check-grid">
-          {order.map((n) => (
-            <button key={n} class="pbtn" onClick={() => (n === target ? onPass() : onCancel())}>
-              {n}
-            </button>
-          ))}
-        </div>
-        <button class="pbtn" onClick={onCancel}>Back</button>
+    <>
+      <p class="parent-muted">For grown-ups</p>
+      <h1 id="check-title" class="check-prompt">Tap {WORDS[target - 1]}</h1>
+      <div class="check-grid">
+        {order.map((n) => (
+          <button key={n} class="pbtn" onClick={() => (n === target ? onPass() : onCancel())}>
+            {n}
+          </button>
+        ))}
       </div>
-    </div>
+      <button class="pbtn" onClick={onCancel}>Back</button>
+    </>
   );
 }
