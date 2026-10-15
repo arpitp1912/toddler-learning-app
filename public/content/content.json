@@ -3,7 +3,7 @@
   "defaults": {
     "peekabooSoundHint": false,
     "bubbleSpeed": "slow",
-    "whoSays": false,
+    "whoSays": true,
     "whoSaysChoices": 2
   },
   "categories": [

@@ -6,7 +6,7 @@ This branch was created from `main`, which already has Peekaboo and Bubbles. It 
 - **Content** (`public/content/content.json`):
   - Every item now has `guessable`. It's true for all animals except fish, and for car, clock, phone and door.
   - `confusableWith` seeds goat↔sheep, crow↔parrot, car↔bus and car↔motorbike. The rule is read both ways, so each pair is listed on one item only.
-  - New defaults: `whoSays: false` and `whoSaysChoices: 2`.
+  - New defaults: `whoSays: true` and `whoSaysChoices: 2`. The mode was first built off by default, then switched on after local testing.
 - **Round generation** (`src/rounds.ts`). This is pure logic, with no screen or audio code.
   - Only items with `guessable: true` and a `soundAudio` are used.
   - Targets come from a shuffle bag: every item is used before any repeats, and the same target never comes twice in a row, even when the bag refills.
@@ -22,7 +22,7 @@ This branch was created from `main`, which already has Peekaboo and Bubbles. It 
 - **Tests:**
   - **Unit:** `src/rounds.test.ts`, run with `npm run test:unit` (Vitest is a new dev dependency). It runs 100 rounds with 5 seeds, for 2 and 3 choices, against both the real `content.json` pool and a mixed test pool with all the confusable pairs. It checks that confusable items never appear together, that no target repeats in consecutive rounds and the pool is used fully each cycle, that no slot is used three times in a row and slot counts stay within 2, and that distractors come from another category when possible. 82 tests pass.
   - **Browser:** `tests/whosays.spec.ts`, run with `npm run test:e2e`. It runs in WebKit and Chromium at 1180×820 and 390×844, 28 tests in all. It checks that:
-    - the tile is hidden while the mode is off;
+    - the tile is hidden when the mode is turned off;
     - the mode loads with "Listen!" then the sound;
     - the choices meet the size rules and never overlap the edge zones or the ear;
     - the ear button replays the sound;
@@ -36,7 +36,7 @@ This branch was created from `main`, which already has Peekaboo and Bubbles. It 
 
 ## Decisions (also in SPEC 14a)
 - **There's no profile settings screen on this branch.** The profile editor is on `feature/m2-profiles`, which isn't merged. The mode reads `profile.whoSays` and `profile.whoSaysChoices` first, then the `content.json` defaults. Both fields are already in the `Profile` type. When M2 is merged, the editor needs a "Who says that?" switch and a 2/3 choice. Expect small conflicts between the two branches in `db.ts` (the Profile type), `App.tsx` and `Home.tsx`.
-- **To try the mode now,** set `defaults.whoSays` to `true` in `content.json` and redeploy. Set `defaults.whoSaysChoices` to `3` to try three choices.
+- **The mode is on for every profile** through `defaults.whoSays: true`. To hide it, set that to `false` and redeploy. Set `defaults.whoSaysChoices` to `3` to try three choices.
 - **Three choices can't each be 35% of the iPad width.** That would need 105%. They share the width between the edge zones, at about 22% each (260 px on a 1180 iPad, well over 160 px). With two choices the edge zones narrow from 180 to 171 design px, so both items reach exactly 35% with no overlap.
 - **Seven tiles on iPad.** There's no maximum-tile rule in the code. Six tiles fit in two rows of three, but seven needed three rows, which got cut off in landscape. So more than six tiles now switch to four per row, at 260 design px each, in landscape only. On iPhone portrait the seven tiles already fit in a 2-column grid, with the seventh spanning the full width.
 - **Sound repeats.** The target sound plays twice, matching the 2026-10-14 decision. A wrong item's own sound plays once, to keep the detour short before the target sound comes back.
@@ -44,7 +44,7 @@ This branch was created from `main`, which already has Peekaboo and Bubbles. It 
 - **The pool today is the 16 animals other than fish.** Car, clock, phone and door have no sound clips yet. Bus, train, aeroplane, motorbike, fire truck, boat and bell aren't in the content. The bus↔fire truck pair needs adding when those items arrive.
 
 ## What to test on the iPad
-1. Set `defaults.whoSays: true` and deploy. Home shows a 7th tile, a peach one with a cow and an ear. In landscape all tiles should fit in two rows of four and three. Check portrait too.
+1. Home shows a 7th tile, a peach one with a cow and an ear. In landscape all tiles should fit in two rows of four and three. Check portrait too.
 2. Open it. Two animals appear, each about a third of the screen wide. About 0.3 s later you hear "Listen!", then one animal's sound twice.
 3. Tap the ear button at the top. The sound plays again.
 4. Tap the wrong animal. It wiggles, says its name and makes its own sound once, then the right sound plays again. There's no buzzer and no red.

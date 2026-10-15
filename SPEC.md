@@ -67,7 +67,7 @@ An offline-capable, installable web app for toddlers aged 18–30 months. It rep
    - **Session:** from the one-minute warning, no new bubbles appear (the bubbles already showing stay until they leave or are popped). At the limit, the goodbye takes over as usual.
    - **Motion budget:** positions are set with `translate3d` from one `requestAnimationFrame` loop. Only transform and opacity animate (no filters, blur or animated shadows), to hold 60 fps on older iPads.
    - **Home tile:** three bubbles with a duck inside the largest, drawn in SVG. It follows the same `modules` rule as Peekaboo (`bubbles`).
-9. **Who says that? (profile setting, off by default):** a sound, and the child taps who makes it.
+9. **Who says that? (profile setting, on by default via `defaults.whoSays`):** a sound, and the child taps who makes it.
    - **Round:** 2 items side by side (3 if the profile asks for 3). 300 ms after they appear, "Listen!" plays (voice-pack prompt `listen`, else the device voice), then the target item's sound (twice with a short gap, as on Cards).
    - **Sizes:** with 2 choices each item is at least 35% of the screen width on iPad. 3 choices can't reach 35% side by side, so they share the width between the edge zones (about 22% each, still over 160 px). On iPhone each is at least 25% of the short edge. A large ear button (SVG, top centre, at least 120 px) replays the target sound.
    - **Right tap:** the item bounces with a gentle sparkle (SVG and CSS, under 800 ms), says its word, then its sound, and the other items fade to 30% opacity. After that, any item can be tapped to hear its name.
@@ -113,7 +113,7 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 ```json
 {
   "version": 1,
-  "defaults": { "peekabooSoundHint": false, "bubbleSpeed": "slow", "whoSays": false, "whoSaysChoices": 2 },
+  "defaults": { "peekabooSoundHint": false, "bubbleSpeed": "slow", "whoSays": true, "whoSaysChoices": 2 },
   "categories": [
     { "id": "animals", "icon": "img/cat/animals.webp" }
   ],
@@ -212,6 +212,7 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 | 2026-10-15 | Who says that?: the target sound plays twice after "Listen!" and on the ear button, as items do elsewhere (2026-10-14). On a wrong tap the tapped item's own sound plays once, to keep the detour short before the target sound returns. |
 | 2026-10-15 | Who says that?: after the right answer, the faded items stay tappable and just say their own word and sound (every tap responds); the target replays its celebration. |
 | 2026-10-15 | Who says that?: only animals have sound clips today, so the pool is the 16 animals other than fish. Car, clock, phone and door are marked guessable but join once their sounds exist. Bus, train, aeroplane, motorbike, fire truck, boat and bell aren't in the content yet; the bus–fire truck pair has to be added to one of those items when they arrive. |
+| 2026-10-15 | Who says that? is on by default (`defaults.whoSays: true`), changed from off after first local testing. A profile can still turn it off once the profile editor (M2) has the switch, or through its `modules` list. |
 | 2026-10-14 | Item sounds play twice with a 400 ms gap after the word, because single clips (under 3 s) felt too short. Clips stay under 3 s on disk. |
 
 ## 15. Acceptance criteria (v1)

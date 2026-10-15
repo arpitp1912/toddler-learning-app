@@ -1,8 +1,8 @@
 import { expect, test, type Page } from '@playwright/test';
 import { spoken, spyOnAudio } from './helpers';
 
-// "Who says that?" smoke tests. The mode is off by default, so content.json is
-// served with it switched on (the service worker is blocked so the route applies).
+// "Who says that?" smoke tests. content.json is served with the mode's settings
+// forced per test (the service worker is blocked so the route applies).
 test.use({ serviceWorkers: 'block' });
 
 const clips = (page: Page) => page.evaluate(() => (window as unknown as { __clips: number }).__clips);
@@ -35,8 +35,8 @@ const choices = (page: Page) => page.locator('.ws-choice');
 const target = (page: Page) => page.locator('.ws-choice[data-target="true"]');
 const distractor = (page: Page) => page.locator('.ws-choice:not([data-target])').first();
 
-test('who says: tile stays hidden while the mode is off', async ({ page }) => {
-  const errors = await open(page, {});
+test('who says: tile stays hidden when the mode is turned off', async ({ page }) => {
+  const errors = await open(page, { whoSays: false });
   await expect(page.getByRole('button', { name: 'bubbles' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'who says that' })).toHaveCount(0);
   expect(errors).toEqual([]);
