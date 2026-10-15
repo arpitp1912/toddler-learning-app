@@ -59,7 +59,7 @@ async function main() {
     const src = family ?? ((await exists(ttsSource(e.kind, e.id))) ? ttsSource(e.kind, e.id) : null);
     if (!src) continue;
     const rel = `audio/${e.kind}/${e.id}.m4a`;
-    const { seconds, report } = await processClip(src, path.join(CONTENT, rel), { bitrate: BITRATE });
+    const { seconds, report } = await processClip(src, path.join(CONTENT, rel), { bitrate: BITRATE, voice: true });
     const tooLong = seconds > MAX_WORD_SECONDS;
     if (tooLong) long++;
     console.log(`${report}  [${family ? 'family' : 'tts'}]${tooLong ? `  ! over ${MAX_WORD_SECONDS} s` : ''}`);

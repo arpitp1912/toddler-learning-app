@@ -101,13 +101,54 @@ function limit(x) {
   return out;
 }
 
+const WINDOW = 0.02 * RATE;   // 20 ms, for measuring room noise
+const NOISE_MARGIN_DB = 12;   // speech must stand this far above the room noise
+const SPEECH_RANGE_DB = 35;   // and within this of the loudest window
+const VOICE_PAD = 0.06 * RATE; // soft consonants (the h in "hen") fade in and out slowly
+const VOICE_FADE_OUT = 0.05 * RATE;
+const MAX_GAP = 0.25 * RATE;     // a longer pause ends the word
+
+/**
+ * Finds speech in a voice recording. Phone recordings carry room noise well
+ * above the fixed -40 dB silence floor, so the floor here comes from the
+ * clip's own noise: the quietest tenth of its 20 ms windows. Only the sound
+ * around the loudest moment is kept: a pause over MAX_GAP ends it.
+ */
+function speechBounds(x) {
+  const rms = [];
+  for (let s = 0; s < x.length; s += WINDOW) {
+    let sum = 0;
+    const end = Math.min(s + WINDOW, x.length);
+    for (let i = s; i < end; i++) sum += x[i] * x[i];
+    rms.push(Math.sqrt(sum / (end - s)));
+  }
+  const sorted = [...rms].sort((a, b) => a - b);
+  const noise = sorted[Math.floor(sorted.length * 0.1)];
+  const loudest = sorted[sorted.length - 1];
+  const floor = Math.max(noise * 10 ** (NOISE_MARGIN_DB / 20), loudest * 10 ** (-SPEECH_RANGE_DB / 20));
+  // Grow outwards from the loudest window across short dips (between syllables),
+  // so a tap or breath after a long pause isn't kept as part of the word.
+  const peak = rms.indexOf(loudest);
+  const maxGap = Math.round(MAX_GAP / WINDOW);
+  const grow = (from, step) => {
+    let edge = from, quiet = 0;
+    for (let i = from + step; i >= 0 && i < rms.length && quiet <= maxGap; i += step) {
+      if (rms[i] > floor) { edge = i; quiet = 0; } else quiet++;
+    }
+    return edge;
+  };
+  const first = grow(peak, -1), last = grow(peak, 1);
+  return [Math.max(0, first * WINDOW - VOICE_PAD), Math.min(x.length, (last + 1) * WINDOW + VOICE_PAD)];
+}
+
 /**
  * Processes one clip and writes it as mono AAC.
  * - `start`: seconds to skip at the start of the source.
  * - `maxSeconds`: longer clips are cut with a fade-out; Infinity never cuts.
+ * - `voice`: trim to the speech using the clip's own noise floor, and fade the end.
  * Returns a one-line report.
  */
-export async function processClip(src, dest, { start: skip = 0, maxSeconds = Infinity, lufs: target = -16, bitrate = 96000 } = {}) {
+export async function processClip(src, dest, { start: skip = 0, maxSeconds = Infinity, lufs: target = -16, bitrate = 96000, voice = false } = {}) {
   const tmp = await mkdtemp(path.join(tmpdir(), 'audio-'));
   try {
     const decoded = path.join(tmp, 'in.wav');
@@ -115,17 +156,23 @@ export async function processClip(src, dest, { start: skip = 0, maxSeconds = Inf
     let x = readFloatWav(await readFile(decoded)).slice(Math.round(skip * RATE));
 
     // Trim leading and trailing silence.
-    const floor = peakOf(x) * 10 ** (SILENCE_DB / 20);
-    let start = x.findIndex((s) => Math.abs(s) > floor);
-    let end = x.length - 1;
-    while (end > start && Math.abs(x[end]) <= floor) end--;
-    start = Math.max(0, start - PAD);
-    end = Math.min(x.length, end + PAD + 1);
+    let start, end;
+    if (voice) {
+      [start, end] = speechBounds(x);
+    } else {
+      const floor = peakOf(x) * 10 ** (SILENCE_DB / 20);
+      start = x.findIndex((s) => Math.abs(s) > floor);
+      end = x.length - 1;
+      while (end > start && Math.abs(x[end]) <= floor) end--;
+      start = Math.max(0, start - PAD);
+      end = Math.min(x.length, end + PAD + 1);
+    }
     const trimmed = end - start > maxSeconds * RATE;
     x = x.slice(start, Math.min(end, start + maxSeconds * RATE));
 
     for (let i = 0; i < FADE_IN && i < x.length; i++) x[i] *= i / FADE_IN;
     if (trimmed) for (let i = 0; i < FADE_OUT; i++) x[x.length - 1 - i] *= i / FADE_OUT;
+    else if (voice) for (let i = 0; i < VOICE_FADE_OUT && i < x.length; i++) x[x.length - 1 - i] *= i / VOICE_FADE_OUT;
 
     // Normalise loudness. Short peaks that would pass MAX_PEAK_DB are turned down
     // by the limiter, so a few spikes don't hold the whole clip below target.

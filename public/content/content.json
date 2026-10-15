@@ -155,7 +155,8 @@
       "tags": [
         "farm",
         "birds"
-      ]
+      ],
+      "wordAudio": "audio/words/hen.m4a"
     },
     {
       "id": "crow",
@@ -185,7 +186,8 @@
       ],
       "tags": [
         "birds"
-      ]
+      ],
+      "wordAudio": "audio/words/parrot.m4a"
     },
     {
       "id": "monkey",
@@ -197,7 +199,8 @@
       "guessable": true,
       "tags": [
         "wild"
-      ]
+      ],
+      "wordAudio": "audio/words/monkey.m4a"
     },
     {
       "id": "elephant",
@@ -209,7 +212,8 @@
       "guessable": true,
       "tags": [
         "wild"
-      ]
+      ],
+      "wordAudio": "audio/words/elephant.m4a"
     },
     {
       "id": "lion",
@@ -221,7 +225,8 @@
       "guessable": true,
       "tags": [
         "wild"
-      ]
+      ],
+      "wordAudio": "audio/words/lion.m4a"
     },
     {
       "id": "frog",
@@ -233,7 +238,8 @@
       "guessable": true,
       "tags": [
         "pond"
-      ]
+      ],
+      "wordAudio": "audio/words/frog.m4a"
     },
     {
       "id": "fish",
@@ -245,7 +251,8 @@
       "guessable": false,
       "tags": [
         "pond"
-      ]
+      ],
+      "wordAudio": "audio/words/fish.m4a"
     },
     {
       "id": "bee",
@@ -257,7 +264,8 @@
       "guessable": true,
       "tags": [
         "garden"
-      ]
+      ],
+      "wordAudio": "audio/words/bee.m4a"
     },
     {
       "id": "car",
@@ -587,11 +595,13 @@
   "prompts": [
     {
       "id": "listen",
-      "text": "Listen!"
+      "text": "Listen!",
+      "audio": "audio/prompts/listen.m4a"
     },
     {
       "id": "peekaboo",
-      "text": "peekaboo"
+      "text": "peekaboo",
+      "audio": "audio/prompts/peekaboo.m4a"
     },
     {
       "id": "bye",

@@ -2,7 +2,7 @@
 
 What to record for the app's built-in voice. Generated from `content.json` by `npm run voice-script`, so rerun that after adding items.
 
-0 of 49 recorded.
+18 of 49 recorded.
 
 ## How to record
 - Say each word warmly and slowly, as if to your toddler. One word per file.
@@ -18,23 +18,23 @@ What to record for the app's built-in voice. Generated from `content.json` by `n
 
 | Say | Save as | Now uses |
 |---|---|---|
-| cow | `cow` | TTS |
-| duck | `duck` | TTS |
-| dog | `dog` | TTS |
-| cat | `cat` | TTS |
-| goat | `goat` | TTS |
-| sheep | `sheep` | TTS |
-| pig | `pig` | TTS |
-| horse | `horse` | TTS |
-| hen | `hen` | Device voice |
+| cow | `cow` | Recorded |
+| duck | `duck` | Recorded |
+| dog | `dog` | Recorded |
+| cat | `cat` | Recorded |
+| goat | `goat` | Recorded |
+| sheep | `sheep` | Recorded |
+| pig | `pig` | Recorded |
+| horse | `horse` | Recorded |
+| hen | `hen` | Recorded |
 | crow | `crow` | Device voice |
-| parrot | `parrot` | Device voice |
-| monkey | `monkey` | Device voice |
-| elephant | `elephant` | Device voice |
-| lion | `lion` | Device voice |
-| frog | `frog` | Device voice |
-| fish | `fish` | Device voice |
-| bee | `bee` | Device voice |
+| parrot | `parrot` | Recorded |
+| monkey | `monkey` | Recorded |
+| elephant | `elephant` | Recorded |
+| lion | `lion` | Recorded |
+| frog | `frog` | Recorded |
+| fish | `fish` | Recorded |
+| bee | `bee` | Recorded |
 
 ## Sounds
 
@@ -84,6 +84,6 @@ What to record for the app's built-in voice. Generated from `content.json` by `n
 
 | Say | Save as | Now uses |
 |---|---|---|
-| Listen! | `listen` | Device voice |
-| peekaboo | `peekaboo` | Device voice |
+| Listen! | `listen` | Recorded |
+| peekaboo | `peekaboo` | Recorded |
 | Bye bye! | `bye` | Device voice |
