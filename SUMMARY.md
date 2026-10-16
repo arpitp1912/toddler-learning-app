@@ -1,6 +1,6 @@
 # Branch summary: `feature/guess-and-home`
 
-Created from `main` on 2026-10-16. Every earlier feature branch (`feature/peekaboo`, `feature/bubbles`, `feature/m2-profiles`, `feature/who-says`, `m1-skeleton`) was already merged into `main`, so nothing was merged into this branch. It is not merged to `main`.
+Created from `main` on 2026-10-16. Every earlier feature branch (`feature/peekaboo`, `feature/bubbles`, `feature/m2-profiles`, `feature/who-says`, `m1-skeleton`) was already merged into `main`, so nothing was merged into this branch. It was merged into `main` on 2026-10-16, and the first production deploy with `wrangler.jsonc` succeeded.
 
 ## What was built
 
