@@ -626,7 +626,8 @@
     },
     {
       "id": "wheres",
-      "text": "Where's the"
+      "text": "Where's the",
+      "audio": "audio/prompts/wheres.m4a"
     },
     {
       "id": "peekaboo",

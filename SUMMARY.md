@@ -73,7 +73,7 @@ Created from `main` on 2026-10-16. Every earlier feature branch (`feature/peekab
 - **Guess is off by default**, as asked. On the iPad, profiles where you had switched "Who says that?" on keep Guess on. Profiles that only had it through the old default (on) now have it off. Switch it on in the profile editor.
 - **The Find it designs (screens 7, 7b, 7c) weren't followed.** They show square cards, a speaker button and a "next" arrow after the right answer. Your brief says one engine, the same position as the ear, a speech-bubble icon and no auto-advance, so word rounds keep the Who-says layout and move on by edge tap or swipe. If you want the square cards from the design, that's a CSS change.
 - **A wrong tap in a word round says only the tapped item's word,** not its sound, as the brief says. That keeps the detour short before the question returns.
-- **"Where's the" has no built-in recording yet,** so it uses the device voice, followed by the family recording of the word. The two voices differ. Record `content-src/voice/family/prompts/wheres.m4a` (it's in VOICE-SCRIPT.md) and run `npm run voice`, or run `npm run tts` for a Gemini clip. I didn't run `npm run tts`, because it would also generate about 30 food and things words that weren't part of this task.
+- **"Where's the" is a family recording** (`content-src/voice/family/prompts/wheres.m4a`, added 2026-10-16), built by `npm run voice` into `audio/prompts/wheres.m4a` (1.04 s; only the silence around the phrase was trimmed). Word rounds now use the family voice for the whole question wherever the word is recorded too (the animals). Fruits and things still say their words with the device voice. I didn't run `npm run tts`, which would generate those words with Gemini; that's a separate step.
 - **Bus↔fire truck isn't seeded.** Neither item exists, and the field has to sit on one of the pair. Add it when bus or fire truck arrives.
 - **Answer-position balance and "no repeat target" are shared across round types.** A cow found in a word round is never the target of the next sound round.
 - **Distractors still prefer a different category** in word rounds too, as in sound rounds. It keeps 2-item rounds easy to tell apart.
@@ -93,7 +93,7 @@ Created from `main` on 2026-10-16. Every earlier feature branch (`feature/peekab
 10. Set **Guess rounds** to **Words** with only **Fruits** on under Look. Only fruit word rounds play. Then set it to **Sounds**: the Guess tile disappears, because fruits have no sounds.
 11. Export a profile and import it on the iPhone. The Guess settings and the Look categories come across.
 12. Turn on airplane mode after one online launch. Look and Guess still work.
-13. Try word rounds with your 24-month-old. Note whether the device-voice "Where's the" followed by the family word sounds odd enough to record `wheres` soon.
+13. Try word rounds with your 24-month-old. Note whether the recorded "Where's the" followed by a device-voice word (fruits and things) sounds odd enough to record or generate those words soon.
 
 ---
 

@@ -2,7 +2,7 @@
 
 What to record for the app's built-in voice. Generated from `content.json` by `npm run voice-script`, so rerun that after adding items.
 
-19 of 50 recorded.
+20 of 50 recorded.
 
 ## How to record
 - Say each word warmly and slowly, as if to your toddler. One word per file.
@@ -85,6 +85,6 @@ What to record for the app's built-in voice. Generated from `content.json` by `n
 | Say | Save as | Now uses |
 |---|---|---|
 | Listen! | `listen` | Recorded |
-| Where's the | `wheres` | Device voice |
+| Where's the | `wheres` | Recorded |
 | peekaboo | `peekaboo` | Recorded |
 | Bye bye! | `bye` | Device voice |
