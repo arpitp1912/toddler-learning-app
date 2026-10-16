@@ -77,6 +77,7 @@ Created from `main` on 2026-10-16. Every earlier feature branch (`feature/peekab
 - **Bus↔fire truck isn't seeded.** Neither item exists, and the field has to sit on one of the pair. Add it when bus or fire truck arrives.
 - **Answer-position balance and "no repeat target" are shared across round types.** A cow found in a word round is never the target of the next sound round.
 - **Distractors still prefer a different category** in word rounds too, as in sound rounds. It keeps 2-item rounds easy to tell apart.
+- **Branch previews:** Cloudflare builds non-main branches with `npx wrangler preview`, which needs a Wrangler config with a `previews` block. The repo had no Wrangler config (production used Wrangler's defaults), so the branch's preview builds failed after a successful `npm run build`. I added `wrangler.jsonc` with the worker name, `dist` as the assets folder and an empty `previews` block. When this merges, production deploys read the same settings; check the first main deploy after the merge.
 - **Look's tile ids are the category ids** (`animals`, `sounds`, `food`, `things`); the child never sees them.
 
 ## What to test on the iPad
