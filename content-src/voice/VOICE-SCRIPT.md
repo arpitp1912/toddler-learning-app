@@ -2,7 +2,7 @@
 
 What to record for the app's built-in voice. Generated from `content.json` by `npm run voice-script`, so rerun that after adding items.
 
-19 of 49 recorded.
+19 of 50 recorded.
 
 ## How to record
 - Say each word warmly and slowly, as if to your toddler. One word per file.
@@ -36,11 +36,28 @@ What to record for the app's built-in voice. Generated from `content.json` by `n
 | fish | `fish` | Recorded |
 | bee | `bee` | Recorded |
 
-## Sounds
+## Vehicles
 
 | Say | Save as | Now uses |
 |---|---|---|
 | car | `car` | Device voice |
+
+## Fruits
+
+| Say | Save as | Now uses |
+|---|---|---|
+| apple | `apple` | Device voice |
+| banana | `banana` | Device voice |
+| lemon | `lemon` | Device voice |
+| watermelon | `watermelon` | Device voice |
+| pomegranate | `pomegranate` | Device voice |
+| orange | `orange` | Device voice |
+| papaya | `papaya` | Device voice |
+| mango | `mango` | Device voice |
+| ice cream | `icecream` | Device voice |
+| guava | `guava` | Device voice |
+| grapes | `grapes` | Device voice |
+| coconut | `coconut` | Device voice |
 
 ## Things
 
@@ -63,27 +80,11 @@ What to record for the app's built-in voice. Generated from `content.json` by `n
 | toothbrush | `toothbrush` | Device voice |
 | umbrella | `umbrella` | Device voice |
 
-## Food
-
-| Say | Save as | Now uses |
-|---|---|---|
-| apple | `apple` | Device voice |
-| banana | `banana` | Device voice |
-| lemon | `lemon` | Device voice |
-| watermelon | `watermelon` | Device voice |
-| pomegranate | `pomegranate` | Device voice |
-| orange | `orange` | Device voice |
-| papaya | `papaya` | Device voice |
-| mango | `mango` | Device voice |
-| ice cream | `icecream` | Device voice |
-| guava | `guava` | Device voice |
-| grapes | `grapes` | Device voice |
-| coconut | `coconut` | Device voice |
-
 ## Prompts
 
 | Say | Save as | Now uses |
 |---|---|---|
 | Listen! | `listen` | Recorded |
+| Where's the | `wheres` | Device voice |
 | peekaboo | `peekaboo` | Recorded |
 | Bye bye! | `bye` | Device voice |

@@ -1,10 +1,11 @@
 // Profile backup (SPEC section 5): a .zip holding manifest.json, profile.json
 // and the profile's photos, to move a profile between devices.
 import { strFromU8, strToU8, unzipSync, zipSync, type Zippable } from 'fflate';
-import { newId, photosFor, type AgeBand, type Photo, type Profile, type SessionLimit } from './db';
+import { newId, photosFor, upgradeProfile, type AgeBand, type Photo, type Profile, type SessionLimit } from './db';
 
 const FORMAT = 'toddler-profile';
-const VERSION = 1;
+// 2: Look and Guess (tile list has `look`, `guess*` replaces `whoSays*`).
+const VERSION = 2;
 
 interface Manifest {
   format: string;
@@ -48,9 +49,10 @@ const BANDS: AgeBand[] = ['18-24', '24-30'];
 const strings = (v: unknown): v is string[] => Array.isArray(v) && v.every((s) => typeof s === 'string');
 
 /** Rebuilds a profile from untrusted JSON, keeping only known fields and valid values. */
-function cleanProfile(raw: unknown, photoIds: Set<string>): Profile {
+function cleanProfile(raw: unknown, photoIds: Set<string>, version: number): Profile {
   if (!raw || typeof raw !== 'object') throw new ImportError('The profile details in this file are missing.');
-  const r = raw as Record<string, unknown>;
+  const r = { ...(raw as Record<string, unknown>) };
+  if (version < 2) upgradeProfile(r);
   if (typeof r.id !== 'string' || !r.id) throw new ImportError('The profile details in this file are damaged.');
   const p: Profile = {
     id: r.id,
@@ -59,7 +61,6 @@ function cleanProfile(raw: unknown, photoIds: Set<string>): Profile {
     ageBand: BANDS.includes(r.ageBand as AgeBand) ? (r.ageBand as AgeBand) : '18-24',
     modules: strings(r.modules) ? r.modules : null,
     sessionLimit: LIMITS.includes(r.sessionLimit as SessionLimit) ? (r.sessionLimit as SessionLimit) : 15,
-    findIt: r.findIt === true,
     voicePacks: strings(r.voicePacks) ? r.voicePacks : [],
     voiceMode: r.voiceMode === 'rotate' ? 'rotate' : 'primary',
     createdAt: typeof r.createdAt === 'number' ? r.createdAt : Date.now(),
@@ -67,8 +68,9 @@ function cleanProfile(raw: unknown, photoIds: Set<string>): Profile {
   if (typeof r.avatarPhoto === 'string' && photoIds.has(r.avatarPhoto)) p.avatarPhoto = r.avatarPhoto;
   if (typeof r.peekabooSoundHint === 'boolean') p.peekabooSoundHint = r.peekabooSoundHint;
   if (r.bubbleSpeed === 'slow' || r.bubbleSpeed === 'normal') p.bubbleSpeed = r.bubbleSpeed;
-  if (typeof r.whoSays === 'boolean') p.whoSays = r.whoSays;
-  if (r.whoSaysChoices === 2 || r.whoSaysChoices === 3) p.whoSaysChoices = r.whoSaysChoices;
+  if (typeof r.guess === 'boolean') p.guess = r.guess;
+  if (r.guessRounds === 'sound' || r.guessRounds === 'word' || r.guessRounds === 'both') p.guessRounds = r.guessRounds;
+  if (r.guessChoices === 2 || r.guessChoices === 3) p.guessChoices = r.guessChoices;
   return p;
 }
 
@@ -97,7 +99,7 @@ export async function readProfileZip(file: Blob): Promise<ProfileBundle> {
     if (typeof m?.id !== 'string' || !data) continue;
     photos.push({ id: m.id, profileId: '', blob: new Blob([data as Uint8Array<ArrayBuffer>], { type: typeof m.type === 'string' ? m.type : 'image/jpeg' }) });
   }
-  const profile = cleanProfile(json('profile.json'), new Set(photos.map((p) => p.id)));
+  const profile = cleanProfile(json('profile.json'), new Set(photos.map((p) => p.id)), manifest.version);
   for (const p of photos) p.profileId = profile.id;
   return { profile, photos };
 }

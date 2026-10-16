@@ -1,19 +1,18 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import type { ComponentChildren } from 'preact';
-import { asset, avatarItems, SUPPORTED_MODULES, type Content } from '../content';
+import { asset, avatarItems, categoryName, SUPPORTED_MODULES, type Content, type GuessRounds } from '../content';
 import {
-  blankProfile, deletePhoto, newId, savePhoto, saveProfile,
+  LOOK, blankProfile, deletePhoto, newId, savePhoto, saveProfile,
   type AgeBand, type Profile, type SessionLimit,
 } from '../db';
 import { forgetPhotoUrl, squarePhoto, usePhotoUrl } from '../photos';
-import { BubblesIcon, PeekabooIcon, WhoSaysIcon } from './icons';
+import { BubblesIcon, GuessIcon, LookIcon, PeekabooIcon } from './icons';
 
 export const LIMITS: SessionLimit[] = [0, 5, 10, 15, 20];
 export const limitLabel = (l: SessionLimit) => (l === 0 ? 'Off' : `${l} min`);
 export const BAND_LABEL: Record<AgeBand, string> = { '18-24': '18–24 months', '24-30': '24–30 months' };
 
-/** Parent-facing name for a category id ("animals" → "Animals"). */
-export const tileName = (id: string) => id.charAt(0).toUpperCase() + id.slice(1);
+const ROUND_LABEL: Record<GuessRounds, string> = { sound: 'Sounds', word: 'Words', both: 'Both' };
 
 interface Props {
   content: Content;
@@ -91,17 +90,21 @@ export function ProfileEditor({ content, profile, canDelete, onSaved, onDelete, 
   };
   const hasPhoto = photo.kind === 'new' || (photo.kind === 'keep' && !!draft.avatarPhoto);
 
-  // Tiles: the categories this build can show, plus the two mode tiles.
-  const tiles = useMemo(
-    () => [
-      ...content.categories
+  // Everything `modules` can switch: the home tiles (Guess has its own switch)
+  // and Look's categories.
+  const homeTiles = [
+    { id: LOOK, name: 'Look', icon: <LookIcon /> },
+    { id: 'peekaboo', name: 'Peekaboo', icon: <PeekabooIcon /> },
+    { id: 'bubbles', name: 'Bubbles', icon: <BubblesIcon /> },
+  ];
+  const categoryTiles = useMemo(
+    () =>
+      content.categories
         .filter((c) => SUPPORTED_MODULES.has(c.module))
-        .map((c) => ({ id: c.id, name: tileName(c.id), icon: <img class="art" src={asset(c.icon)} alt="" /> })),
-      { id: 'peekaboo', name: 'Peekaboo', icon: <PeekabooIcon /> },
-      { id: 'bubbles', name: 'Bubbles', icon: <BubblesIcon /> },
-    ],
+        .map((c) => ({ id: c.id, name: categoryName(c), icon: <img class="art" src={asset(c.icon)} alt="" /> })),
     [content],
   );
+  const tiles = [...homeTiles, ...categoryTiles];
   const tileOn = (id: string) => draft.modules == null || draft.modules.includes(id);
   const toggleTile = (id: string, on: boolean) => {
     const current = draft.modules ?? tiles.map((t) => t.id);
@@ -112,9 +115,11 @@ export function ProfileEditor({ content, profile, canDelete, onSaved, onDelete, 
 
   const hintDefault = content.defaults?.peekabooSoundHint ?? false;
   const speedDefault = content.defaults?.bubbleSpeed ?? 'slow';
-  // Who says that? has its own on/off (`whoSays`), not an entry in the tile list.
-  const whoSaysOn = draft.whoSays ?? content.defaults?.whoSays ?? false;
-  const choicesDefault = content.defaults?.whoSaysChoices ?? 2;
+  // Guess has its own on/off (`guess`), not an entry in the tile list.
+  const guessOn = draft.guess ?? content.defaults?.guess ?? false;
+  const roundsDefault = content.defaults?.guessRounds ?? 'both';
+  const choicesDefault = content.defaults?.guessChoices ?? 2;
+  const noCategories = categoryTiles.every((t) => !tileOn(t.id));
 
   const save = async () => {
     if (saving) return;
@@ -210,7 +215,7 @@ export function ProfileEditor({ content, profile, canDelete, onSaved, onDelete, 
       <section class="parent-card">
         <h2>Home screen</h2>
         <p class="parent-muted">Choose which pictures appear on your child's home screen.</p>
-        {tiles.map((t) => (
+        {homeTiles.map((t) => (
           <div class="prow" key={t.id}>
             <span class="prow-icon" aria-hidden="true">{t.icon}</span>
             <div class="prow-text"><div class="prow-title">{t.name}</div></div>
@@ -218,13 +223,29 @@ export function ProfileEditor({ content, profile, canDelete, onSaved, onDelete, 
           </div>
         ))}
         <div class="prow">
-          <span class="prow-icon" aria-hidden="true"><WhoSaysIcon /></span>
-          <div class="prow-text"><div class="prow-title">Who says that?</div></div>
-          <Switch on={whoSaysOn} label="Who says that?" onChange={(on) => set('whoSays', on)} />
+          <span class="prow-icon" aria-hidden="true"><GuessIcon /></span>
+          <div class="prow-text">
+            <div class="prow-title">Guess</div>
+            <div class="parent-muted prow-note">"Who says that?" sounds and "Where's the cow?" words. Suggested from 24 months.</div>
+          </div>
+          <Switch on={guessOn} label="Guess" onChange={(on) => set('guess', on)} />
         </div>
-        {tiles.every((t) => !tileOn(t.id)) && !whoSaysOn && (
+        {homeTiles.every((t) => !tileOn(t.id)) && !guessOn && (
           <p class="parent-error">With everything off, the home screen will be empty.</p>
         )}
+      </section>
+
+      <section class="parent-card">
+        <h2>Look</h2>
+        <p class="parent-muted">Choose the picture groups. Look shows one tile for each, and the games use their pictures.</p>
+        {categoryTiles.map((t) => (
+          <div class="prow" key={t.id}>
+            <span class="prow-icon" aria-hidden="true">{t.icon}</span>
+            <div class="prow-text"><div class="prow-title">{t.name}</div></div>
+            <Switch on={tileOn(t.id)} label={t.name} onChange={(on) => toggleTile(t.id, on)} />
+          </div>
+        ))}
+        {noCategories && <p class="parent-error">With every group off, there are no pictures to play with.</p>}
       </section>
 
       <section class="parent-card">
@@ -256,28 +277,27 @@ export function ProfileEditor({ content, profile, canDelete, onSaved, onDelete, 
             </button>
           ))}
         </div>
-        {whoSaysOn && (
+        {guessOn && (
           <>
-            <div class="prow-title">Who says that? pictures</div>
-            <div class="seg" role="group" aria-label="Who says that? pictures">
+            <div class="prow-title">Guess rounds</div>
+            <div class="parent-muted prow-note">Sounds: "Who says that?" Words: "Where's the cow?" Both: a mix of the two.</div>
+            <div class="seg" role="group" aria-label="Guess rounds">
+              {(['sound', 'word', 'both'] as const).map((r) => (
+                <button key={r} class="pbtn" aria-pressed={(draft.guessRounds ?? roundsDefault) === r} onClick={() => set('guessRounds', r)}>
+                  {ROUND_LABEL[r]}
+                </button>
+              ))}
+            </div>
+            <div class="prow-title">Guess pictures</div>
+            <div class="seg" role="group" aria-label="Guess pictures">
               {([2, 3] as const).map((n) => (
-                <button key={n} class="pbtn" aria-pressed={(draft.whoSaysChoices ?? choicesDefault) === n} onClick={() => set('whoSaysChoices', n)}>
+                <button key={n} class="pbtn" aria-pressed={(draft.guessChoices ?? choicesDefault) === n} onClick={() => set('guessChoices', n)}>
                   {n === 2 ? '2 to choose from' : '3 to choose from'}
                 </button>
               ))}
             </div>
           </>
         )}
-        <Row
-          title="Find it"
-          note={
-            <>
-              Suggested from 24 months. "Where's the cow?" play arrives in a later update; this choice is saved for it.
-            </>
-          }
-        >
-          <Switch on={draft.findIt} label="Find it" onChange={(on) => set('findIt', on)} />
-        </Row>
       </section>
 
       <div class="pbtn-row">

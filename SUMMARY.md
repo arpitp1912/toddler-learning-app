@@ -1,8 +1,106 @@
-# Branch summary: `feature/who-says`
+# Branch summary: `feature/guess-and-home`
+
+Created from `main` on 2026-10-16. Every earlier feature branch (`feature/peekaboo`, `feature/bubbles`, `feature/m2-profiles`, `feature/who-says`, `m1-skeleton`) was already merged into `main`, so nothing was merged into this branch. It is not merged to `main`.
+
+## What was built
+
+### Part 1: Home restructure
+- **Home** (`src/components/Home.tsx`) shows at most 4 activity tiles: **Look**, **Peekaboo**, **Bubbles** and **Guess**. In landscape, four tiles sit in two rows of two. Five tiles (when Scenes arrives) fall into the design's 3 + 2 rows with no CSS change. The old 7- and 8-tile CSS is gone.
+- **Look screen** (`Look` in `Home.tsx`) has one tile per category enabled for the profile: Animals, Vehicles, Fruits and Things. It uses the same tile size and layout as Home, and the home button sits in the usual corner. A tile opens the existing Cards for that category. The home button, on Look and on the cards, goes back to Home.
+- **Vehicles:** the category id stays `sounds`, because saved profiles store it in their tile lists and the image paths use it. It now has `"name": "Vehicles"` in `content.json`, shown in the profile editor. The icon was already the car; I removed the speaker badge (and its CSS). Food is named **Fruits**, as asked.
+- **New SVG tile icons** (`icons.tsx`):
+  - **Look:** an open eye with a cow's face in the iris.
+  - **Guess:** an ear with sound arriving, and a pointing hand. There's no question mark.
+  - **Speech bubble:** the word-round replay button.
+- The separate Who-says tile is gone.
+- **Profile editor:** the "Home screen" card has switches for Look, Peekaboo, Bubbles and Guess. A new "Look" card has the four category switches; these also decide which pictures the games use. The old "Find it" switch is gone, because Find it is now a Guess round type.
+
+### Part 2: Guess
+- **One engine** (`src/rounds.ts`, `guessEngine`) makes both round types.
+  - Each type has its own target bag, so a type's targets cycle through its pool before repeating.
+  - The no-repeated-target rule and the answer-position balance are shared across both types.
+  - With both types on, `kindPicker` chooses at random and never gives 3 of the same type in a row.
+- **Sound round:** the existing Who-says behaviour, unchanged: "Listen!", then the sound twice; the ear button replays it. It uses only items with `guessable: true` and a sound, and never shows `confusableWith` pairs together.
+- **Word round (Find it):** "Where's the" plays, then the target's word. The prompt `wheres` uses a voice-pack clip if there is one, else a built-in clip, else the device voice; the word uses its recorded audio, else the device voice.
+  - **Right tap:** the item bounces with a sparkle and says its word and sound, and the others fade.
+  - **Wrong tap:** the tapped item wiggles and says its own word, then the question plays again.
+  - **Replay:** the speech-bubble button sits where the ear is and repeats the question.
+  - **Items:** any item, never with its `lookalikeWith` pairs on screen.
+- **Screen** (`src/components/Guess.tsx`, renamed from `WhoSays.tsx`): the same layout, sizes, sparkle, edge zones and swipe as before. `data-kind` on the screen says which round type is showing.
+- **Settings per profile** (`guess`, `guessRounds`, `guessChoices`), defaults from `content.json`:
+  - Guess off.
+  - Rounds "both".
+  - 2 choices.
+
+  The editor shows Rounds (Sounds / Words / Both) and Pictures (2 / 3) while Guess is on. A round type with fewer than 2 usable items is skipped. With only Fruits enabled, for example, "both" plays word rounds only. The tile hides if no chosen type can play.
+- **`lookalikeWith`** in `content.json`, read both ways, seeded with lemon↔orange, guava↔mango, cup↔jug, goat↔sheep, hen↔duck, crow↔parrot and ball↔orange.
+- **Saved profiles carry over** (`upgradeProfile` in `db.ts`, through a database version 3 upgrade and on importing backups made before this version):
+  - a saved tile list gains `look`, so children whose tile lists were trimmed still reach their categories;
+  - `whoSays` and `whoSaysChoices` become `guess` and `guessChoices` where the parent had set them;
+  - `findIt` is dropped.
+
+  Backups are now format version 2.
+
+### Part 3: Housekeeping
+- **SPEC.md:** the new Home, the Look screen, Guess with its two round types, the `wheres` prompt, `lookalikeWith`, the category `name`, the new defaults and settings, and 6 decision-log entries.
+- **`npm run voice-script`** now lists "Where's the" (`wheres`) under prompts, and uses the category names as headings.
+- **Unit tests** (`npm run test:unit`, 309 pass):
+  - `src/rounds.test.ts` runs 100 rounds × 5 seeds × 2 and 3 choices, for sound only, word only and both. It uses the real `content.json` pools and a mixed pool with overlapping confusable and look-alike pairs. It checks that:
+    - word rounds never pair look-alikes, and sound rounds never pair confusables or use non-guessable items;
+    - the round type never runs 3 in a row, and each type gets a fair share;
+    - no target repeats in consecutive rounds, and pools cycle;
+    - the answer position never sits in one slot 3 times running and stays balanced.
+
+    There are also direct tests of `kindPicker`, `usableKinds` and the seeded look-alike pairs.
+  - `src/db.test.ts` tests the profile upgrade.
+- **Playwright** (WebKit and Chromium, at 1180×820 and 390×844): 98 pass. The 2 skipped are the existing two-finger Bubbles test in WebKit.
+  - `tests/home.spec.ts`:
+    - Home shows exactly the 4 activity tiles with Guess on, and 3 with it off;
+    - Look's 4 tiles match Home's size and position, and the home button never covers them;
+    - Animals opens cards that speak and step on;
+    - the home button returns to Home;
+    - Vehicles opens the car.
+  - `tests/guess.spec.ts`:
+    - sound rounds: the earlier checks (sizes, "Listen!", ear replay, right and wrong taps, edge and swipe, 3 choices);
+    - word rounds: the question and its replay button, a right tap (word, sound, sparkle, fade), and a wrong tap (wiggle, that word, then the question again);
+    - "both": 8 rounds that mix types with never 3 in a row.
+
+    Every test checks for no console errors.
+  - `tests/profiles.spec.ts`: the editor switches Guess on with Words and 3 pictures, turning Vehicles off removes it from Look, and switching Guess off hides the tile.
+- `tsc --noEmit` and `npm run build` pass.
+
+## Decisions
+- **Guess is off by default**, as asked. On the iPad, profiles where you had switched "Who says that?" on keep Guess on. Profiles that only had it through the old default (on) now have it off. Switch it on in the profile editor.
+- **The Find it designs (screens 7, 7b, 7c) weren't followed.** They show square cards, a speaker button and a "next" arrow after the right answer. Your brief says one engine, the same position as the ear, a speech-bubble icon and no auto-advance, so word rounds keep the Who-says layout and move on by edge tap or swipe. If you want the square cards from the design, that's a CSS change.
+- **A wrong tap in a word round says only the tapped item's word,** not its sound, as the brief says. That keeps the detour short before the question returns.
+- **"Where's the" has no built-in recording yet,** so it uses the device voice, followed by the family recording of the word. The two voices differ. Record `content-src/voice/family/prompts/wheres.m4a` (it's in VOICE-SCRIPT.md) and run `npm run voice`, or run `npm run tts` for a Gemini clip. I didn't run `npm run tts`, because it would also generate about 30 food and things words that weren't part of this task.
+- **Bus↔fire truck isn't seeded.** Neither item exists, and the field has to sit on one of the pair. Add it when bus or fire truck arrives.
+- **Answer-position balance and "no repeat target" are shared across round types.** A cow found in a word round is never the target of the next sound round.
+- **Distractors still prefer a different category** in word rounds too, as in sound rounds. It keeps 2-item rounds easy to tell apart.
+- **Look's tile ids are the category ids** (`animals`, `sounds`, `food`, `things`); the child never sees them.
+
+## What to test on the iPad
+1. After updating, open the app. Your existing profile should still show its usual pictures. Home shows **Look, Peekaboo and Bubbles**: three tiles, two on top and one below, in landscape.
+2. In the parent area, edit the profile. Under **Home screen**, switch **Guess** on. Under **Games**, check that **Guess rounds** shows Sounds / Words / Both (Both selected) and **Guess pictures** shows 2 / 3. Save. Home now shows four tiles in a 2 × 2 grid. Check portrait too.
+3. Tap **Look** (the eye with a cow). Four tiles appear in the same places as Home's tiles, with the home button top left. Tap the car: the car card plays. Tap the home button: you're back on Home, not on Look.
+4. In the editor, switch off **Vehicles** under **Look**. Look now shows three tiles, and Guess and Bubbles no longer use the car.
+5. Tap **Guess** (the ear and pointing hand). Play 8–10 rounds with edge taps or swipes. You should get a mix of "Listen!" rounds (ear button) and "Where's the …?" rounds (speech bubble), never three of the same in a row.
+6. In a word round, tap the wrong item. It wiggles and says its name, then "Where's the …" comes again. Tap the right one. It bounces with a sparkle, says its name and sound, and the other fades. Tap the speech bubble to hear the question again.
+7. Look-alikes: over many word rounds, lemon and orange, ball and orange, guava and mango, cup and jug, goat and sheep, hen and duck, and crow and parrot never appear together.
+8. Tap quickly between the items and the replay button while audio plays. You never hear two sounds at once.
+9. Set **Guess pictures** to 3. Three items fit, none under the arrows.
+10. Set **Guess rounds** to **Words** with only **Fruits** on under Look. Only fruit word rounds play. Then set it to **Sounds**: the Guess tile disappears, because fruits have no sounds.
+11. Export a profile and import it on the iPhone. The Guess settings and the Look categories come across.
+12. Turn on airplane mode after one online launch. Look and Guess still work.
+13. Try word rounds with your 24-month-old. Note whether the device-voice "Where's the" followed by the family word sounds odd enough to record `wheres` soon.
+
+---
+
+# Earlier branch: `feature/who-says` (merged into `main` 2026-10-15)
 
 This branch was created from `main`, which already had Peekaboo and Bubbles. It adds the "Who says that?" mode, and `feature/m2-profiles` (profiles, export/import, toddler picker, PIN) was merged in so both could be tested together. Both are now merged into `main` (2026-10-15).
 
-# Who says that?
+## Who says that?
 
 ## What was built
 - **Content** (`public/content/content.json`):
@@ -60,7 +158,7 @@ This branch was created from `main`, which already had Peekaboo and Bubbles. It 
 11. Turn on airplane mode after one online launch. The mode still plays.
 12. Try it with your child. Note whether two items is right at 20 months, and whether "Listen!" before the sound helps or gets in the way.
 
-# Profiles (M2)
+## Profiles (M2)
 
 Merged in from `feature/m2-profiles`. Milestone M2 (SPEC section 14): profiles and export/import, plus the toddler profile picker and the parent PIN from the settings list in SPEC section 8. Branched from `main` after Peekaboo and Bubbles were merged.
 

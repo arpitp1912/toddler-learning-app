@@ -3,34 +3,38 @@
   "defaults": {
     "peekabooSoundHint": false,
     "bubbleSpeed": "slow",
-    "whoSays": true,
-    "whoSaysChoices": 2
+    "guess": false,
+    "guessRounds": "both",
+    "guessChoices": 2
   },
   "categories": [
     {
       "id": "animals",
+      "name": "Animals",
       "module": "cards",
       "icon": "img/animals/cow.webp",
       "tint": "sage"
     },
     {
       "id": "sounds",
+      "name": "Vehicles",
       "module": "cards",
       "icon": "img/sounds/car.webp",
-      "tint": "sky",
-      "badge": "sound"
-    },
-    {
-      "id": "things",
-      "module": "cards",
-      "icon": "img/things/teddybear.webp",
-      "tint": "butter"
+      "tint": "sky"
     },
     {
       "id": "food",
+      "name": "Fruits",
       "module": "cards",
       "icon": "img/food/apple.webp",
       "tint": "peach"
+    },
+    {
+      "id": "things",
+      "name": "Things",
+      "module": "cards",
+      "icon": "img/things/teddybear.webp",
+      "tint": "butter"
     }
   ],
   "items": [
@@ -100,7 +104,10 @@
       "tags": [
         "farm"
       ],
-      "wordAudio": "audio/words/goat.m4a"
+      "wordAudio": "audio/words/goat.m4a",
+      "lookalikeWith": [
+        "sheep"
+      ]
     },
     {
       "id": "sheep",
@@ -156,7 +163,10 @@
         "farm",
         "birds"
       ],
-      "wordAudio": "audio/words/hen.m4a"
+      "wordAudio": "audio/words/hen.m4a",
+      "lookalikeWith": [
+        "duck"
+      ]
     },
     {
       "id": "crow",
@@ -172,7 +182,10 @@
       "tags": [
         "birds"
       ],
-      "wordAudio": "audio/words/crow.m4a"
+      "wordAudio": "audio/words/crow.m4a",
+      "lookalikeWith": [
+        "parrot"
+      ]
     },
     {
       "id": "parrot",
@@ -315,6 +328,9 @@
       "guessable": false,
       "tags": [
         "fruit"
+      ],
+      "lookalikeWith": [
+        "orange"
       ]
     },
     {
@@ -392,6 +408,9 @@
       "guessable": false,
       "tags": [
         "fruit"
+      ],
+      "lookalikeWith": [
+        "mango"
       ]
     },
     {
@@ -425,6 +444,9 @@
       "guessable": false,
       "tags": [
         "toys"
+      ],
+      "lookalikeWith": [
+        "orange"
       ]
     },
     {
@@ -480,6 +502,9 @@
       "guessable": false,
       "tags": [
         "home"
+      ],
+      "lookalikeWith": [
+        "jug"
       ]
     },
     {
@@ -598,6 +623,10 @@
       "id": "listen",
       "text": "Listen!",
       "audio": "audio/prompts/listen.m4a"
+    },
+    {
+      "id": "wheres",
+      "text": "Where's the"
     },
     {
       "id": "peekaboo",

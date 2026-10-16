@@ -36,7 +36,7 @@ An offline-capable, installable web app for toddlers aged 18–30 months. It rep
 
 | Item | Behaviour |
 |---|---|
-| Profile fields | id, display name (parent-only), avatar photo (from camera or library) or preset animal avatar, age band, enabled modules (home tile ids: category ids plus `peekaboo` and `bubbles`), session limit (minutes), Peekaboo sound hint, Bubbles speed, Who says that? on or off and its number of choices, assigned voice packs and voice mode, created date |
+| Profile fields | id, display name (parent-only), avatar photo (from camera or library) or preset animal avatar, age band, enabled modules (home tile ids `look`, `peekaboo`, `bubbles`, plus the category ids Look shows; none listed means all), session limit (minutes), Peekaboo sound hint, Bubbles speed, Guess on or off, its round types and its number of choices, assigned voice packs and voice mode, created date |
 | Multiple profiles | Unlimited profiles per device, for example Grandma's iPad holding both children. |
 | Launch | Opens directly into the last-used profile. The child never sees a picker by default. |
 | Switching | Done from the parent area. An optional toddler-facing picker (large avatar faces) can be turned on. |
@@ -46,12 +46,14 @@ An offline-capable, installable web app for toddlers aged 18–30 months. It rep
 | Cloud sync | None. Each household installs the app on its own device and creates its own profile. Content updates arrive through redeploys, not through sync. |
 
 ## 6. Child-facing modules (v1)
-1. **Home:** 4–5 giant picture tiles: Animals, Sounds, Places, Counting, Letters. Which tiles appear is set per profile.
-2. **Cards:** one item fills the screen. When a card appears it plays the word, then the sound twice (with a short gap), with the bounce or wiggle starting at the same time, so the child sees the item responds. Tapping the item replays this. Tapping the right or left edge, or swiping, moves to the next or previous card. A home button sits in a corner and is large and icon-only.
+1. **Home:** at most 4 giant activity tiles, in this order: **Look**, **Peekaboo**, **Bubbles**, **Guess** (Scenes will be a 5th later, giving the design's 3 + 2 rows). Each profile chooses which show. Four tiles sit in two rows of two in landscape and a 2-column grid in portrait. There is no home button on Home.
+   - **Look tile:** an eye with a cow inside it, drawn in SVG. It shows when the profile's modules allow `look` and at least one category is enabled.
+   - **Look screen:** one tile per item category enabled for the profile (Animals, Vehicles, Fruits, Things, in `content.json` order), with the same tile size and layout as Home and the home button in its usual corner. Tapping a tile opens Cards for that category. There is no back gesture; the home button (here and on the cards) returns to Home.
+2. **Cards (opened from Look):** one item fills the screen. When a card appears it plays the word, then the sound twice (with a short gap), with the bounce or wiggle starting at the same time, so the child sees the item responds. Tapping the item replays this. Tapping the right or left edge, or swiping, moves to the next or previous card. A home button sits in a corner and is large and icon-only.
 3. **Scenes:** a full-screen illustration (farm, street, house, park, beach) with 6–10 hotspots. Each hotspot plays its word and sound and animates. Hotspot coordinates are defined in the content data.
 4. **Counting:** 1–5 identical objects. Tapping each one says "one", "two" and so on. After the last object, the total is spoken again.
 5. **Letters:** one large letter beside an object image ("A — apple"). Tapping either plays both. Letters are drawn with a font, not generated images.
-6. **Find it (profile setting, off by default; suggested for age 24 months and over):** 2–3 items shown, a prompt says "Where's the cow?". Tapping the correct item celebrates it. Tapping a wrong item names that item and re-prompts. No failure state.
+6. **Find it:** now a round type of Guess (word round, item 9).
 7. **Peekaboo:** one large cover (at least 60% of the short edge) hides an item. While waiting, the cover gives a gentle wiggle every 3 s (static under reduced motion). Each new cover says "peekaboo" as it appears. Tapping it opens the cover (500 ms or less) and reveals the item, which plays the word, then the item's sound (as on a card: twice with a short gap), then bounces. Tapping the revealed item replays the word and sound. Edge taps or a swipe, as on Cards, close a new cover over the next item; there is no auto-advance. Taps on the cover while it is opening are ignored, so audio never plays twice.
    - **Covers:** bush (parts left and right), door (swings open), cloud (drifts up), blanket (lifts from one corner). They are drawn in inline SVG with the design tokens, no image files, and rotate in that order each round. Under reduced motion the cover cross-fades instead.
    - **Items:** drawn at random from the item categories enabled for the profile, with no repeats until every item has been shown. Item images only, never scene images. Item audio and fallbacks as on Cards.
@@ -67,16 +69,19 @@ An offline-capable, installable web app for toddlers aged 18–30 months. It rep
    - **Session:** from the one-minute warning, no new bubbles appear (the bubbles already showing stay until they leave or are popped). At the limit, the goodbye takes over as usual.
    - **Motion budget:** positions are set with `translate3d` from one `requestAnimationFrame` loop. Only transform and opacity animate (no filters, blur or animated shadows), to hold 60 fps on older iPads.
    - **Home tile:** three bubbles with a duck inside the largest, drawn in SVG. It follows the same `modules` rule as Peekaboo (`bubbles`).
-9. **Who says that? (profile setting, on by default via `defaults.whoSays`):** a sound, and the child taps who makes it.
-   - **Round:** 2 items side by side (3 if the profile asks for 3). 300 ms after they appear, "Listen!" plays (voice-pack prompt `listen`, else the device voice), then the target item's sound (twice with a short gap, as on Cards).
-   - **Sizes:** with 2 choices each item is at least 35% of the screen width on iPad. 3 choices can't reach 35% side by side, so they share the width between the edge zones (about 22% each, still over 160 px). On iPhone each is at least 25% of the short edge. A large ear button (SVG, top centre, at least 120 px) replays the target sound.
-   - **Right tap:** the item bounces with a gentle sparkle (SVG and CSS, under 800 ms), says its word, then its sound, and the other items fade to 30% opacity. After that, any item can be tapped to hear its name.
-   - **Wrong tap:** that item wiggles and says its own word and its own sound (once), then the target sound plays again. No negative visuals or sounds, and the round goes on.
-   - **Audio:** taps are accepted while audio plays; a new tap stops the current audio first, so audio never overlaps. A tap before "Listen!" starts cancels it.
+9. **Guess (profile setting, off by default via `defaults.guess`; suggested from 24 months):** 2 items side by side (3 if the profile asks for 3), and a question. Two round types share one engine:
+   - **Sound round ("Who says that?"):** 300 ms after the items appear, "Listen!" plays (voice-pack prompt `listen`, else the built-in clip, else the device voice), then the target item's sound (twice with a short gap, as on Cards). A large ear button (SVG, top centre, at least 120 px) replays the target sound. **Wrong tap:** that item wiggles and says its own word and its own sound (once), then the target sound plays again.
+   - **Word round ("Find it"):** 300 ms after the items appear, "Where's the" plays (voice-pack prompt `wheres`, else the built-in clip, else the device voice), then the target's word (recorded word audio, else the device voice). A speech-bubble button in the ear button's place repeats the question. **Wrong tap:** that item wiggles and says its own word, then the question plays again.
+   - **Round types (profile setting):** sound, word or both (default both, from `defaults.guessRounds`). With both, the type is picked at random each round, never more than 2 of the same type in a row. A type with fewer than 2 usable items in the enabled categories is left out; the tile hides when no chosen type is usable.
+   - **Choices (profile setting):** 2 or 3 (default 2, from `defaults.guessChoices`).
+   - **Sizes:** with 2 choices each item is at least 35% of the screen width on iPad. 3 choices can't reach 35% side by side, so they share the width between the edge zones (about 22% each, still over 160 px). On iPhone each is at least 25% of the short edge.
+   - **Right tap (both types):** the item bounces with a gentle sparkle (SVG and CSS, under 800 ms), says its word, then its sound, and the other items fade to 30% opacity. After that, any item can be tapped to hear its name.
+   - No negative visuals or sounds, and the round goes on.
+   - **Audio:** taps are accepted while audio plays; a new tap stops the current audio first, so audio never overlaps. A tap before the question starts cancels it.
    - **Next round:** edge-zone tap or swipe, as on Cards (both directions bring a new round). No auto-advance.
-   - **Items:** only items with `guessable: true` and a `soundAudio`, from the categories enabled for the profile. Targets cycle through the pool before repeating and never repeat in consecutive rounds. The target's position is random, never in the same slot more than twice in a row, and balanced over time. Distractors are guessable items, from a different category than the target where possible. Items listed as `confusableWith` each other never appear in the same round.
+   - **Items:** from the categories enabled for the profile. Sound rounds use only items with `guessable: true` and a `soundAudio`; word rounds use any item. Each type's targets cycle through its pool before repeating, and no target repeats in consecutive rounds, whatever the types. The target's position is random, never in the same slot more than twice in a row, and balanced over time (shared across both types). Distractors come from a different category than the target where possible. Items listed as `confusableWith` each other never appear in the same sound round; items listed as `lookalikeWith` each other never appear in the same word round.
    - **Reduced motion:** a gentle scale and fade replaces the bounce, wiggle and sparkle.
-   - **Home tile:** an ear beside a cow, drawn in SVG. It shows only when the mode is on for the profile (its own switch, not the `modules` list) and there are at least two usable items.
+   - **Home tile:** an ear listening and a pointing hand, drawn in SVG, on peach. It shows only when Guess is on for the profile (its own switch, not the `modules` list).
 
 ## 7. Session control
 - Each profile has a limit of 5, 10, 15 or 20 minutes, or off.
@@ -87,7 +92,7 @@ An offline-capable, installable web app for toddlers aged 18–30 months. It rep
 - Manage profiles: create, edit, delete, export and import.
 - **Voice packs (optional, M5):** see section 8a.
 - Custom photo cards: take a photo, record a word, choose a category. Stored per profile.
-- Settings: modules on or off (including the Peekaboo and Bubbles tiles), session limit, Find-it mode, Peekaboo sound hint, Bubbles speed (slow or normal), Who says that? (on or off; 2 or 3 choices), toddler-facing profile picker, PIN.
+- Settings: home tiles on or off (Look, Peekaboo, Bubbles, Guess), Look's categories on or off (these also set which items the games use), session limit, Peekaboo sound hint, Bubbles speed (slow or normal), Guess round types (sounds, words or both) and 2 or 3 choices, toddler-facing profile picker, PIN.
 - Usage log: sessions per day, minutes, most-tapped items. Local only.
 - Setup help: how to install to the home screen and how to enable Guided Access.
 
@@ -102,9 +107,9 @@ A voice pack is a named set of recordings by one adult, such as "Papa", "Mumma" 
 - **Assigning voices to a profile:** an ordered list of packs. Voice mode is either *primary* (always use the first pack that has the word) or *rotate* (pick at random from the packs that have the word).
 - **Fallback:** the built-in default voice plays for any word that no assigned pack has recorded.
 - **Prompts:** recorded once per pack, alongside the item words. If a pack has no recording, the default voice says the prompt.
-  - "Where's the…" (Find it): joined to the item word.
+  - "Where's the…" (Guess word rounds, prompt id `wheres`): joined to the item word.
   - "Peekaboo" (Peekaboo): said as each new cover appears.
-  - "Listen!" (Who says that?, prompt id `listen`): said at the start of each round, before the target sound.
+  - "Listen!" (Guess sound rounds, prompt id `listen`): said at the start of each round, before the target sound.
 - **Microphone:** iOS asks for microphone permission on first use. Show a short explanation screen before the prompt appears.
 
 ## 9. Content model
@@ -113,9 +118,9 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 ```json
 {
   "version": 1,
-  "defaults": { "peekabooSoundHint": false, "bubbleSpeed": "slow", "whoSays": true, "whoSaysChoices": 2 },
+  "defaults": { "peekabooSoundHint": false, "bubbleSpeed": "slow", "guess": false, "guessRounds": "both", "guessChoices": 2 },
   "categories": [
-    { "id": "animals", "icon": "img/cat/animals.webp" }
+    { "id": "animals", "name": "Animals", "module": "cards", "icon": "img/animals/cow.webp", "tint": "sage" }
   ],
   "items": [
     {
@@ -144,10 +149,12 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 ```
 - Hotspot x, y and r are fractions of the image's width and height, so they scale across devices.
 - `word` is used as the text-to-speech fallback if `wordAudio` is missing.
-- `prompts` lists the spoken prompts (`listen`, `peekaboo`, `bye`) with their `text` and, once built, `audio` (the built-in voice). A voice pack's recording of a prompt wins over `audio`; with neither, the device voice says `text`.
-- `defaults` holds profile settings used until a profile sets its own (currently `peekabooSoundHint`, `bubbleSpeed`, `whoSays` and `whoSaysChoices`).
-- `guessable` marks items that "Who says that?" can use (they also need a `soundAudio`). Currently true for all animals except fish, vehicle horns and sirens (car, bus, train, aeroplane, motorbike, fire truck, boat), bell, clock, phone and door; false for everything else. Set it on new items as they are added.
-- `confusableWith` (optional) lists item ids whose sounds are too alike to show together in "Who says that?". It is read both ways, so a pair needs listing on only one item, and it may name items not yet added. Seeded pairs: goat–sheep, crow–parrot, car–bus, car–motorbike, bus–fire truck.
+- Categories: `name` is the parent-facing name (shown in the profile editor; the child sees only the icon). The `sounds` category is named Vehicles: its id stays `sounds` because saved profiles and image paths use it.
+- `prompts` lists the spoken prompts (`listen`, `wheres`, `peekaboo`, `bye`) with their `text` and, once built, `audio` (the built-in voice). A voice pack's recording of a prompt wins over `audio`; with neither, the device voice says `text`.
+- `defaults` holds profile settings used until a profile sets its own (currently `peekabooSoundHint`, `bubbleSpeed`, `guess`, `guessRounds` and `guessChoices`).
+- `guessable` marks items that Guess sound rounds can use (they also need a `soundAudio`). Currently true for all animals except fish, vehicle horns and sirens (car, bus, train, aeroplane, motorbike, fire truck, boat), bell, clock, phone and door; false for everything else. Set it on new items as they are added.
+- `confusableWith` (optional) lists item ids whose sounds are too alike to show together in a Guess sound round. It is read both ways, so a pair needs listing on only one item, and it may name items not yet added. Seeded pairs: goat–sheep, crow–parrot, car–bus, car–motorbike, bus–fire truck.
+- `lookalikeWith` (optional) lists item ids that look too alike to show together in a Guess word round, read the same way. Seeded pairs: lemon–orange, guava–mango, cup–jug, goat–sheep, hen–duck, crow–parrot, ball–orange. Bus–fire truck is to be added when either item arrives.
 - `decor` lists item ids used as decoration: `start` and `goodbye` for those screens, and `avatars` for the preset profile pictures in the profile editor.
 
 **v1 content target:** 40 animals, 20 everyday sounds (vehicles, household, nature), 5 scenes, counting objects for 1–5, 26 letter–object pairs. Letter objects reuse items wherever possible.
@@ -191,7 +198,7 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 | M2 | Profiles and export/import | Two profiles on one iPad with separate settings |
 | M3 | Scenes, Counting, Letters | All modules render from `content.json` |
 | M4 | Full v1 content | Asset targets in section 9 met, bundle under 50 MB |
-| M5 | Find-it mode, optional parent voice recorder, custom photo cards, usage log | Enabled for the 24-month profile |
+| M5 | Optional parent voice recorder, custom photo cards, usage log (Find it arrived early, as a Guess round type) | Enabled for the 24-month profile |
 
 ## 14a. Decision log
 | Date | Decision |
@@ -226,6 +233,12 @@ All built-in content lives in `/public/content/content.json`. The app is a rende
 | 2026-10-14 | Item sounds play twice with a 400 ms gap after the word, because single clips (under 3 s) felt too short. Clips stay under 3 s on disk. |
 | 2026-10-16 | Built-in voice: item words and prompts can come from Gemini TTS (`npm run tts`) until family recordings replace them. Family source files always win and are never overwritten. The style instruction is sent as a speech style note, because sent as text before the word the model read the whole instruction aloud. |
 | 2026-10-16 | Prompts moved into `content.json` (`prompts`), so their built-in audio is content, not code. "Bye bye!" on the goodbye screen became prompt `bye`. |
+| 2026-10-16 | Home restructure (branch `feature/guess-and-home`): Home holds at most 4 activity tiles (Look, Peekaboo, Bubbles, Guess; Scenes later as a 5th). The category tiles moved to a Look screen with the same layout. This settles the tile set left open on 2026-10-13 and 2026-10-15. |
+| 2026-10-16 | The "Sounds" category is shown as Vehicles (`name` in `content.json`). Its id stays `sounds`, since saved profiles and image paths use it. Its icon was already the car; the speaker badge is gone. Food is shown as Fruits. |
+| 2026-10-16 | Profiles saved before this change (database version 3 upgrade, backup format version 2): a saved tile list gains `look`; `whoSays` and `whoSaysChoices` become `guess` and `guessChoices` where the parent had set them; `findIt` is dropped. |
+| 2026-10-16 | "Who says that?" became Guess, with sound and word ("Find it") rounds. Guess is off by default (`defaults.guess: false`), changed from Who says that? being on; profiles where the parent switched Who says that? on keep Guess on. |
+| 2026-10-16 | Guess word rounds: the replay button is a speech bubble in the ear button's place, and a wrong tap says only the tapped item's word (no sound) before the question returns. The Find it screens in the design (speaker button, a next arrow after the right answer) predate this and were not followed: Guess keeps the Who-says layout and moves on by edge tap or swipe only. |
+| 2026-10-16 | Guess: the answer slot balance and the no-repeat rule run across both round types, so a cow found in a word round is never the next sound round's target. |
 
 ## 15. Acceptance criteria (v1)
 - Installs to the iPad and iPhone home screens and launches full-screen with no Safari interface.

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { avatarItems, itemById, itemsIn, loadContent, SUPPORTED_MODULES, type Category, type Content, type Item } from './content';
 import {
-  deleteProfile, listProfiles, loadDeviceSettings, loadProfile, putImported, requestPersistence,
+  LOOK, deleteProfile, listProfiles, loadDeviceSettings, loadProfile, putImported, requestPersistence,
   saveDeviceSettings, setLastProfile, type DeviceSettings, type Profile,
 } from './db';
 import type { ProfileBundle } from './backup';
@@ -9,12 +9,12 @@ import { forgetPhotoUrl } from './photos';
 import { setBuiltInPrompts, stopAll, unlockAudio } from './audio';
 import { useSession, WARNING_MS } from './session';
 import { TapToStart } from './components/TapToStart';
-import { Home } from './components/Home';
+import { Home, Look } from './components/Home';
 import { Cards } from './components/Cards';
 import { Peekaboo } from './components/Peekaboo';
 import { Bubbles } from './components/Bubbles';
-import { WhoSays } from './components/WhoSays';
-import { guessPool } from './rounds';
+import { Guess } from './components/Guess';
+import { soundPool, usableKinds, wordPool } from './rounds';
 import { FadingSun, Goodbye, Lock } from './components/SessionEnd';
 import { ParentCheck, ParentCorner } from './components/ParentGate';
 import { ParentPanel } from './components/ParentPanel';
@@ -22,12 +22,13 @@ import { ProfilePicker } from './components/ProfilePicker';
 
 type View =
   | { name: 'home' }
+  | { name: 'look' }
   | { name: 'cards'; categoryId: string }
   | { name: 'peekaboo' }
   | { name: 'bubbles' }
-  | { name: 'whosays' };
+  | { name: 'guess' };
 
-/** Home tile ids for the modes in `profile.modules`, alongside category ids. */
+/** Home tile ids in `profile.modules`, alongside Look's category ids (Guess has its own switch). */
 const PEEKABOO = 'peekaboo';
 const BUBBLES = 'bubbles';
 type ParentStep = null | 'check' | 'panel';
@@ -79,6 +80,7 @@ export function App() {
     } else if (session.phase === 'locked') startOnLoad.current = false;
   }, [session.phase]);
 
+  // Look's categories, in content.json order.
   const categories = useMemo<Category[]>(() => {
     if (!content || !profile) return [];
     return content.categories.filter(
@@ -94,24 +96,28 @@ export function App() {
     [content, view],
   );
 
-  // Peekaboo and Bubbles draw items from every category the profile has enabled.
+  // Peekaboo, Bubbles and Guess draw items from every category the profile has enabled.
   const mixedItems = useMemo(
     () => (content ? categories.flatMap((c) => itemsIn(content, c.id)) : []),
     [content, categories],
   );
   const modeOn = (id: string) =>
     !!profile && (profile.modules == null || profile.modules.includes(id)) && mixedItems.length > 0;
+  const lookOn = modeOn(LOOK);
   const peekabooOn = modeOn(PEEKABOO);
   const bubblesOn = modeOn(BUBBLES);
   const soundHint = profile?.peekabooSoundHint ?? content?.defaults?.peekabooSoundHint ?? false;
   const bubbleSpeed = profile?.bubbleSpeed ?? content?.defaults?.bubbleSpeed ?? 'slow';
 
-  // Who says that?: shown when the profile (or content defaults) turns it on, with
-  // at least two guessable items with sounds in the enabled categories. Its own
-  // switch, not the tile list, decides: lists saved before the mode existed lack it.
-  const guessItems = useMemo(() => guessPool(mixedItems), [mixedItems]);
-  const whoSaysOn = (profile?.whoSays ?? content?.defaults?.whoSays ?? false) && guessItems.length >= 2;
-  const whoSaysChoices = profile?.whoSaysChoices ?? content?.defaults?.whoSaysChoices ?? 2;
+  // Guess: shown when the profile (or content defaults) turns it on and at least
+  // one of its chosen round types has two usable items in the enabled categories.
+  // Its own switch, not the tile list, decides (as "Who says that?" did before it).
+  const soundItems = useMemo(() => soundPool(mixedItems), [mixedItems]);
+  const wordItems = useMemo(() => wordPool(mixedItems), [mixedItems]);
+  const guessRounds = profile?.guessRounds ?? content?.defaults?.guessRounds ?? 'both';
+  const guessKinds = useMemo(() => usableKinds(guessRounds, soundItems, wordItems), [guessRounds, soundItems, wordItems]);
+  const guessOn = (profile?.guess ?? content?.defaults?.guess ?? false) && guessKinds.length > 0;
+  const guessChoices = profile?.guessChoices ?? content?.defaults?.guessChoices ?? 2;
 
   const showPicker = device.picker && profiles.length > 1;
   const start = () => {
@@ -204,21 +210,29 @@ export function App() {
       break;
     default:
       screen =
-        view.name === 'cards' && deck.length ? (
+        view.name === 'look' && lookOn ? (
+          <Look categories={categories} onOpen={(c) => setView({ name: 'cards', categoryId: c.id })} onHome={goHome} />
+        ) : view.name === 'cards' && deck.length ? (
           <Cards key={view.categoryId} items={deck} onHome={goHome} />
         ) : view.name === 'peekaboo' && peekabooOn ? (
           <Peekaboo items={mixedItems} soundHint={soundHint} onHome={goHome} />
         ) : view.name === 'bubbles' && bubblesOn ? (
           <Bubbles items={mixedItems} speed={bubbleSpeed} spawning={!warning} onHome={goHome} />
-        ) : view.name === 'whosays' && whoSaysOn ? (
-          <WhoSays key={whoSaysChoices} items={guessItems} choices={whoSaysChoices} onHome={goHome} />
+        ) : view.name === 'guess' && guessOn ? (
+          <Guess
+            key={`${guessKinds.join()}-${guessChoices}`}
+            soundItems={soundItems}
+            wordItems={wordItems}
+            kinds={guessKinds}
+            choices={guessChoices}
+            onHome={goHome}
+          />
         ) : (
           <Home
-            categories={categories}
-            onOpen={(c) => setView({ name: 'cards', categoryId: c.id })}
+            onLook={lookOn ? () => setView({ name: 'look' }) : undefined}
             onPeekaboo={peekabooOn ? () => setView({ name: 'peekaboo' }) : undefined}
             onBubbles={bubblesOn ? () => setView({ name: 'bubbles' }) : undefined}
-            onWhoSays={whoSaysOn ? () => setView({ name: 'whosays' }) : undefined}
+            onGuess={guessOn ? () => setView({ name: 'guess' }) : undefined}
           />
         );
   }

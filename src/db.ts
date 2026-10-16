@@ -2,7 +2,7 @@
 // If IndexedDB is unavailable (private mode, old WebKit bug), fall back to
 // in-memory state so playback never breaks.
 import Dexie, { type Table } from 'dexie';
-import type { BubbleSpeed, WhoSaysChoices } from './content';
+import type { BubbleSpeed, GuessChoices, GuessRounds } from './content';
 
 export type SessionLimit = 0 | 5 | 10 | 15 | 20; // minutes, 0 = off
 export type AgeBand = '18-24' | '24-30';
@@ -13,13 +13,13 @@ export interface Profile {
   avatar: string;            // preset item id, shown when there is no photo
   avatarPhoto?: string;      // id in the photos table
   ageBand: AgeBand;
-  modules: string[] | null;  // enabled home tile ids (category ids, 'peekaboo', 'bubbles'), null = all
+  modules: string[] | null;  // enabled ids: home tiles ('look', 'peekaboo', 'bubbles') and Look's category ids; null = all
   sessionLimit: SessionLimit;
-  findIt: boolean;
   peekabooSoundHint?: boolean; // unset = content.json defaults
   bubbleSpeed?: BubbleSpeed;   // unset = content.json defaults
-  whoSays?: boolean;           // "Who says that?" tile, unset = content.json defaults (off)
-  whoSaysChoices?: WhoSaysChoices; // unset = content.json defaults (2)
+  guess?: boolean;             // Guess tile, unset = content.json defaults (off)
+  guessRounds?: GuessRounds;   // unset = content.json defaults (both)
+  guessChoices?: GuessChoices; // unset = content.json defaults (2)
   voicePacks: string[];
   voiceMode: 'primary' | 'rotate';
   createdAt: number;
@@ -68,7 +68,33 @@ class AppDB extends Dexie {
     super('toddler-learning');
     this.version(1).stores({ profiles: 'id', sessions: 'profileId', meta: 'key' });
     this.version(2).stores({ photos: 'id, profileId' });
+    // Home restructure: categories moved behind the Look tile, and
+    // "Who says that?" became Guess.
+    this.version(3).stores({}).upgrade((tx) =>
+      tx.table('profiles').toCollection().modify((p: Record<string, unknown>) => upgradeProfile(p)),
+    );
   }
+}
+
+/** Look tile id in `modules`. */
+export const LOOK = 'look';
+
+/**
+ * Brings a profile saved before Guess and Look (database version 2, backup
+ * version 1) up to date, in place:
+ * - a saved tile list gains `look`, since categories used to be home tiles and
+ *   should still be reachable;
+ * - `whoSays` and `whoSaysChoices` become `guess` and `guessChoices` (only values
+ *   the parent set; unset still means the content defaults);
+ * - `findIt` is dropped: Find it is now a Guess round type.
+ */
+export function upgradeProfile(p: Record<string, unknown>) {
+  if (Array.isArray(p.modules) && !p.modules.includes(LOOK)) p.modules = [LOOK, ...p.modules];
+  if (typeof p.whoSays === 'boolean' && p.guess === undefined) p.guess = p.whoSays;
+  if ((p.whoSaysChoices === 2 || p.whoSaysChoices === 3) && p.guessChoices === undefined) p.guessChoices = p.whoSaysChoices;
+  delete p.whoSays;
+  delete p.whoSaysChoices;
+  delete p.findIt;
 }
 
 const db = new AppDB();
@@ -89,7 +115,6 @@ export function blankProfile(avatar: string, id = newId()): Profile {
     ageBand: '18-24',
     modules: null,
     sessionLimit: 15,
-    findIt: false,
     voicePacks: [],
     voiceMode: 'primary',
     createdAt: Date.now(),

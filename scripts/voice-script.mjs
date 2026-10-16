@@ -23,13 +23,13 @@ async function table(entries, heading) {
 const entries = voiceEntries(content);
 const words = entries.filter((e) => e.kind === 'words');
 const prompts = entries.filter((e) => e.kind === 'prompts');
-const categories = content.categories.map((c) => c.id);
+const categories = content.categories;
 const recorded = (await Promise.all(entries.map(status))).filter((s) => s === 'Recorded').length;
 
 const sections = [];
 for (const cat of categories) {
-  const inCat = words.filter((e) => e.entry.category === cat);
-  if (inCat.length) sections.push(await table(inCat, `## ${cat[0].toUpperCase()}${cat.slice(1)}`));
+  const inCat = words.filter((e) => e.entry.category === cat.id);
+  if (inCat.length) sections.push(await table(inCat, `## ${cat.name ?? cat.id[0].toUpperCase() + cat.id.slice(1)}`));
 }
 
 const md = `# Voice script

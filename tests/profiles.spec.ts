@@ -178,22 +178,32 @@ test('export and import a profile with its photo', async ({ page }) => {
   errors = errors.filter((e) => !e.includes('[import]'));
 });
 
-test('the editor turns "Who says that?" off and sets three pictures', async ({ page }) => {
+test('the editor turns Guess on with word rounds and three pictures, and trims Look', async ({ page }) => {
   await openParent(page);
   await row(page, 'Child').getByRole('button', { name: 'Edit' }).click();
+  // Guess is off by default, so its options are hidden until it is switched on.
+  await expect(page.getByRole('button', { name: '3 to choose from' })).toHaveCount(0);
+  await page.getByRole('switch', { name: 'Guess' }).click();
+  await page.getByRole('button', { name: 'Words', exact: true }).click();
   await page.getByRole('button', { name: '3 to choose from' }).click();
+  await page.getByRole('switch', { name: 'Vehicles' }).click();
   await page.getByRole('button', { name: 'Save' }).click();
   await play(page);
-  await page.getByRole('button', { name: 'who says that' }).click();
-  await expect(page.locator('.ws-choice')).toHaveCount(3);
+  await page.getByRole('button', { name: 'guess' }).click();
+  await expect(page.locator('.screen.guess')).toHaveAttribute('data-kind', 'word');
+  await expect(page.locator('.gs-choice')).toHaveCount(3);
+  await page.getByRole('button', { name: 'Home' }).click();
+  await page.getByRole('button', { name: 'look', exact: true }).click();
+  await expect(page.locator('.tile')).toHaveCount(3);
+  await expect(page.getByRole('button', { name: 'sounds', exact: true })).toHaveCount(0);
   await page.getByRole('button', { name: 'Home' }).click();
 
   await openParent(page);
   await row(page, 'Child').getByRole('button', { name: 'Edit' }).click();
-  await page.getByRole('switch', { name: 'Who says that?' }).click();
+  await page.getByRole('switch', { name: 'Guess' }).click();
   await expect(page.getByRole('button', { name: '3 to choose from' })).toHaveCount(0);
   await page.getByRole('button', { name: 'Save' }).click();
   await page.getByRole('button', { name: 'Back to play' }).click();
   await expect(page.getByRole('button', { name: 'bubbles' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'who says that' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'guess' })).toHaveCount(0);
 });

@@ -165,7 +165,7 @@ const Ear = ({ fill = 'var(--tint-peach)' }: { fill?: string }) => (
   </>
 );
 
-/** Who says that?: the replay button. */
+/** Guess sound round: the replay button. */
 export const EarIcon = () => (
   <svg {...base} viewBox="0 0 120 120">
     <g fill="none" stroke="var(--c-terracotta)" stroke-width="6" stroke-linecap="round">
@@ -176,30 +176,78 @@ export const EarIcon = () => (
   </svg>
 );
 
-/** Home tile for "Who says that?": a cow, its sound, and an ear listening. */
-export const WhoSaysIcon = () => (
+/** A cow's face, centred near (78, 118) in a 200 box. Shared by the Look and Guess art. */
+const CowFace = () => (
+  <>
+    <ellipse cx="34" cy="96" rx="16" ry="9" transform="rotate(-24 34 96)" fill="var(--c-paper)" stroke="var(--c-ink)" stroke-width="4" />
+    <ellipse cx="122" cy="96" rx="16" ry="9" transform="rotate(24 122 96)" fill="var(--c-paper)" stroke="var(--c-ink)" stroke-width="4" />
+    <path d="M52 84q-4-14 6-18" fill="none" stroke="var(--c-honey)" stroke-width="7" stroke-linecap="round" />
+    <path d="M104 84q4-14-6-18" fill="none" stroke="var(--c-honey)" stroke-width="7" stroke-linecap="round" />
+    <rect x="44" y="80" width="68" height="92" rx="32" fill="var(--c-paper)" stroke="var(--c-ink)" stroke-width="4" />
+    <path d="M48 104q4-18 22-20q-2 16-22 20z" fill="var(--c-ink)" />
+    <circle cx="66" cy="114" r="5" fill="var(--c-ink)" />
+    <circle cx="92" cy="114" r="5" fill="var(--c-ink)" />
+    <ellipse cx="78" cy="150" rx="30" ry="20" fill="var(--tint-peach-edge)" stroke="var(--c-ink)" stroke-width="4" />
+    <ellipse cx="68" cy="150" rx="4" ry="6" fill="var(--c-ink)" />
+    <ellipse cx="88" cy="150" rx="4" ry="6" fill="var(--c-ink)" />
+  </>
+);
+
+/** Home tile for Look: a wide-open eye with a cow inside it. */
+export const LookIcon = () => (
   <svg {...base} class="icon icon--tile" viewBox="0 0 200 200">
-    {/* Cow face */}
-    <g transform="translate(-14 0)">
-      <ellipse cx="34" cy="96" rx="16" ry="9" transform="rotate(-24 34 96)" fill="var(--c-paper)" stroke="var(--c-ink)" stroke-width="4" />
-      <ellipse cx="122" cy="96" rx="16" ry="9" transform="rotate(24 122 96)" fill="var(--c-paper)" stroke="var(--c-ink)" stroke-width="4" />
-      <path d="M52 84q-4-14 6-18" fill="none" stroke="var(--c-honey)" stroke-width="7" stroke-linecap="round" />
-      <path d="M104 84q4-14-6-18" fill="none" stroke="var(--c-honey)" stroke-width="7" stroke-linecap="round" />
-      <rect x="44" y="80" width="68" height="92" rx="32" fill="var(--c-paper)" stroke="var(--c-ink)" stroke-width="4" />
-      <path d="M48 104q4-18 22-20q-2 16-22 20z" fill="var(--c-ink)" />
-      <circle cx="66" cy="114" r="5" fill="var(--c-ink)" />
-      <circle cx="92" cy="114" r="5" fill="var(--c-ink)" />
-      <ellipse cx="78" cy="150" rx="30" ry="20" fill="var(--tint-peach-edge)" stroke="var(--c-ink)" stroke-width="4" />
-      <ellipse cx="68" cy="150" rx="4" ry="6" fill="var(--c-ink)" />
-      <ellipse cx="88" cy="150" rx="4" ry="6" fill="var(--c-ink)" />
+    <g fill="none" stroke="var(--c-ink)" stroke-width="5" stroke-linecap="round">
+      <path d="M52 52 42 36" />
+      <path d="M100 38V20" />
+      <path d="M148 52l10-16" />
     </g>
-    {/* Sound travelling up to the ear */}
-    <g fill="none" stroke="var(--c-terracotta)" stroke-width="5" stroke-linecap="round">
-      <path d="M128 122q10-8 4-20" />
-      <path d="M140 130q20-14 8-38" />
+    <path d="M10 104Q100 8 190 104Q100 200 10 104Z" fill="var(--c-paper)" stroke="var(--c-ink)" stroke-width="5" stroke-linejoin="round" />
+    <circle cx="100" cy="104" r="54" fill="var(--tint-sky)" stroke="var(--c-ink)" stroke-width="5" />
+    <g transform="translate(100 108) scale(.56) translate(-78 -120)">
+      <CowFace />
     </g>
-    <g transform="translate(116 8) scale(.68)">
+    <ellipse cx="72" cy="78" rx="10" ry="6" transform="rotate(-38 72 78)" fill="var(--c-paper)" opacity=".85" />
+  </svg>
+);
+
+/** Home tile for Guess: an ear listening, and a hand pointing to choose. */
+export const GuessIcon = () => (
+  <svg {...base} class="icon icon--tile" viewBox="0 0 200 200">
+    <g fill="none" stroke="var(--c-terracotta)" stroke-width="6" stroke-linecap="round">
+      <path d="M30 52q-8 14 0 28" />
+      <path d="M16 42q-16 24 0 48" />
+    </g>
+    <g transform="translate(6 2) scale(.95)">
       <Ear fill="var(--c-paper)" />
+    </g>
+    {/* A hand, index finger pointing up and to the left */}
+    <g transform="rotate(-30 128 150)" stroke="var(--c-ink)" stroke-width="4.5" stroke-linejoin="round">
+      <rect x="160" y="128" width="20" height="50" rx="6" fill="var(--c-terracotta)" />
+      <rect x="54" y="134" width="74" height="24" rx="12" fill="var(--c-paper)" />
+      <rect x="106" y="124" width="60" height="60" rx="22" fill="var(--c-paper)" />
+      <path d="M112 128q4-16 22-14q8 2 6 12" fill="var(--c-paper)" />
+      <g fill="none" stroke-linecap="round">
+        <path d="M112 160h22" />
+        <path d="M112 174h18" />
+      </g>
+    </g>
+  </svg>
+);
+
+/** Guess word round: the replay button, a speech bubble. */
+export const SpeechIcon = () => (
+  <svg {...base} viewBox="0 0 120 120">
+    <path
+      d="M24 20h72a14 14 0 0 1 14 14v40a14 14 0 0 1-14 14H56L32 106l4-18h-12a14 14 0 0 1-14-14V34a14 14 0 0 1 14-14z"
+      fill="var(--tint-peach)"
+      stroke="var(--c-ink)"
+      stroke-width="5"
+      stroke-linejoin="round"
+    />
+    <g fill="var(--c-terracotta)">
+      <circle cx="40" cy="54" r="7" />
+      <circle cx="60" cy="54" r="7" />
+      <circle cx="80" cy="54" r="7" />
     </g>
   </svg>
 );

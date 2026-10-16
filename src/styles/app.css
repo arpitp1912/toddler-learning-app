@@ -126,32 +126,16 @@ button {
 }
 .tile:active { transform: translateY(calc(8 * var(--u))) scale(.98); }
 .tile img { width: calc(290 * var(--u)); height: calc(290 * var(--u)); }
-.tile-badge {
-  position: absolute;
-  right: calc(26 * var(--u));
-  top: calc(26 * var(--u));
-  width: calc(76 * var(--u));
-  height: calc(76 * var(--u));
-  border-radius: 50%;
-  background: var(--c-paper);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.tile-badge .icon { width: calc(44 * var(--u)); height: calc(44 * var(--u)); }
 [data-tint="sage"]         { --tile: var(--tint-sage);   --tile-edge: var(--tint-sage-edge); }
 [data-tint="sky"]          { --tile: var(--tint-sky);    --tile-edge: var(--tint-sky-edge); }
 [data-tint="peach"]        { --tile: var(--tint-peach);  --tile-edge: var(--tint-peach-edge); }
 [data-tint="butter"]       { --tile: var(--tint-butter); --tile-edge: var(--tint-butter-edge); }
 [data-tint="lilac"]        { --tile: var(--tint-lilac);  --tile-edge: var(--tint-lilac-edge); }
 
-/* More than six tiles (with "Who says that?" on): four smaller tiles per row on iPad,
-   so two rows still fit. Each stays over 160 px. */
+/* Four tiles (Home with every mode on, or Look with every category): two rows
+   of two in landscape, as the 3 + 2 rows of the design are for five. */
 @media (orientation: landscape) {
-  .tiles[data-count="7"], .tiles[data-count="8"] { gap: calc(30 * var(--u)); max-width: calc((260 * 4 + 30 * 3) * var(--u)); }
-  .tiles[data-count="7"] .tile, .tiles[data-count="8"] .tile { width: calc(260 * var(--u)); height: calc(250 * var(--u)); }
-  .tiles[data-count="7"] .tile img, .tiles[data-count="8"] .tile img,
-  .tiles[data-count="7"] .tile .icon--tile, .tiles[data-count="8"] .tile .icon--tile { width: calc(215 * var(--u)); height: calc(215 * var(--u)); }
+  .tiles[data-count="4"] { max-width: calc((340 * 2 + 36) * var(--u)); }
 }
 
 @media (orientation: portrait) {
@@ -171,8 +155,6 @@ button {
   .tile:active { transform: translateY(calc(6 * var(--u))) scale(.98); }
   .tile:last-child:nth-child(odd) { grid-column: 1 / -1; }
   .tile img { width: calc(170 * var(--u)); height: calc(170 * var(--u)); }
-  .tile-badge { right: calc(14 * var(--u)); top: calc(14 * var(--u)); width: calc(46 * var(--u)); height: calc(46 * var(--u)); }
-  .tile-badge .icon { width: calc(28 * var(--u)); height: calc(28 * var(--u)); }
 }
 
 /* ---------- Home button (corner, every child screen except Home) ---------- */
@@ -775,26 +757,26 @@ button {
 /* Icons inside fixed-size boxes fill them. */
 .star .icon, .lock-padlock .icon { width: 100%; height: 100%; }
 
-/* ---------- Who says that? ---------- */
+/* ---------- Guess (sound and word rounds) ---------- */
 /*
  * Landscape (iPad frame): two choices at 413 design px are 35% of the width,
  * and the edge zones narrow to 171 so both fit with no overlap. Three choices
  * can't reach 35% side by side; they fill the space between the usual edge zones.
  */
-.whosays { --ws-size: calc(413 * var(--u)); --ws-gap: calc(12 * var(--u)); --ws-ear: max(calc(150 * var(--u)), 120px); }
-.whosays[data-choices="3"] { --ws-size: calc(260 * var(--u)); --ws-gap: calc(20 * var(--u)); }
-.whosays .edge--prev { width: calc(171 * var(--u) + var(--safe-l)); }
-.whosays .edge--next { width: calc(171 * var(--u) + var(--safe-r)); }
-.whosays[data-choices="3"] .edge--prev { width: calc(180 * var(--u) + var(--safe-l)); }
-.whosays[data-choices="3"] .edge--next { width: calc(180 * var(--u) + var(--safe-r)); }
+.guess { --gs-size: calc(413 * var(--u)); --gs-gap: calc(12 * var(--u)); --gs-btn: max(calc(150 * var(--u)), 120px); }
+.guess[data-choices="3"] { --gs-size: calc(260 * var(--u)); --gs-gap: calc(20 * var(--u)); }
+.guess .edge--prev { width: calc(171 * var(--u) + var(--safe-l)); }
+.guess .edge--next { width: calc(171 * var(--u) + var(--safe-r)); }
+.guess[data-choices="3"] .edge--prev { width: calc(180 * var(--u) + var(--safe-l)); }
+.guess[data-choices="3"] .edge--next { width: calc(180 * var(--u) + var(--safe-r)); }
 
-.ws-ear {
+.gs-replay {
   position: absolute;
   left: 50%;
   top: calc(24 * var(--u) + var(--safe-t));
-  width: var(--ws-ear);
-  height: var(--ws-ear);
-  margin-left: calc(var(--ws-ear) / -2);
+  width: var(--gs-btn);
+  height: var(--gs-btn);
+  margin-left: calc(var(--gs-btn) / -2);
   border-radius: 50%;
   background: var(--c-paper);
   box-shadow: 0 calc(6 * var(--u)) 0 var(--c-ink-shadow);
@@ -804,40 +786,40 @@ button {
   z-index: 3;
   transition: transform var(--t-press) ease;
 }
-.ws-ear:active { transform: translateY(calc(4 * var(--u))); }
-.ws-ear .icon { width: 72%; height: 72%; }
-.ws-ear--A .icon { animation: bounceA var(--t-bounce) var(--ease-bounce); }
-.ws-ear--B .icon { animation: bounceB var(--t-bounce) var(--ease-bounce); }
+.gs-replay:active { transform: translateY(calc(4 * var(--u))); }
+.gs-replay .icon { width: 72%; height: 72%; }
+.gs-replay--A .icon { animation: bounceA var(--t-bounce) var(--ease-bounce); }
+.gs-replay--B .icon { animation: bounceB var(--t-bounce) var(--ease-bounce); }
 
-.ws-choices {
+.gs-choices {
   position: absolute;
   left: 0;
   right: 0;
-  top: max(calc(190 * var(--u)), calc(24 * var(--u) + var(--ws-ear) + 12px));
+  top: max(calc(190 * var(--u)), calc(24 * var(--u) + var(--gs-btn) + 12px));
   bottom: calc(20 * var(--u));
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--ws-gap);
+  gap: var(--gs-gap);
 }
-.ws-choice {
+.gs-choice {
   position: relative;
   flex: none;
-  width: var(--ws-size);
-  height: var(--ws-size);
+  width: var(--gs-size);
+  height: var(--gs-size);
   border-radius: 50%;
   background: var(--c-paper);
   box-shadow: 0 calc(8 * var(--u)) 0 var(--c-ink-ghost);
   transition: opacity var(--t-dim) ease;
 }
-.ws-choice.is-faded { opacity: .3; }
-.ws-choice.is-answer { background: var(--c-butter); }
-.ws-art { position: absolute; inset: 8%; display: block; }
-.ws-art img { width: 100%; height: 100%; object-fit: contain; }
+.gs-choice.is-faded { opacity: .3; }
+.gs-choice.is-answer { background: var(--c-butter); }
+.gs-art { position: absolute; inset: 8%; display: block; }
+.gs-art img { width: 100%; height: 100%; object-fit: contain; }
 
 /* Correct answer: eight sparks fly out from the centre and fade. */
-.ws-sparkle { position: absolute; inset: 0; pointer-events: none; }
-.ws-spark {
+.gs-sparkle { position: absolute; inset: 0; pointer-events: none; }
+.gs-spark {
   position: absolute;
   left: 50%;
   top: 50%;
@@ -847,7 +829,7 @@ button {
   opacity: 0;
   animation: spark var(--t-sparkle) ease-out forwards;
 }
-.ws-spark .icon { width: 100%; height: 100%; }
+.gs-spark .icon { width: 100%; height: 100%; }
 @keyframes spark {
   0% { opacity: 0; transform: rotate(var(--a)) translateY(-40%) scale(.3); }
   25% { opacity: 1; }
@@ -855,17 +837,17 @@ button {
 }
 
 @media (orientation: portrait) {
-  .whosays { --ws-size: max(calc(170 * var(--u)), 42vw); --ws-gap: calc(12 * var(--u)); --ws-ear: max(calc(110 * var(--u)), 120px); }
-  .whosays[data-choices="3"] { --ws-size: max(calc(112 * var(--u)), 29vw); --ws-gap: calc(8 * var(--u)); }
-  .whosays .edge--prev, .whosays .edge--next,
-  .whosays[data-choices="3"] .edge--prev, .whosays[data-choices="3"] .edge--next { width: 50%; }
-  .ws-ear { top: calc(var(--ft) + 24 * var(--u) + var(--safe-t)); }
-  .ws-choices { top: calc(var(--ft) + 170 * var(--u)); bottom: auto; height: calc(390 * var(--u)); }
+  .guess { --gs-size: max(calc(170 * var(--u)), 42vw); --gs-gap: calc(12 * var(--u)); --gs-btn: max(calc(110 * var(--u)), 120px); }
+  .guess[data-choices="3"] { --gs-size: max(calc(112 * var(--u)), 29vw); --gs-gap: calc(8 * var(--u)); }
+  .guess .edge--prev, .guess .edge--next,
+  .guess[data-choices="3"] .edge--prev, .guess[data-choices="3"] .edge--next { width: 50%; }
+  .gs-replay { top: calc(var(--ft) + 24 * var(--u) + var(--safe-t)); }
+  .gs-choices { top: calc(var(--ft) + 170 * var(--u)); bottom: auto; height: calc(390 * var(--u)); }
 }
 /* Phone landscape: keep the edge zones at 25% of the short edge, as on Cards. */
 @media (orientation: landscape) and (max-height: 500px) {
-  .whosays .edge--prev, .whosays[data-choices="3"] .edge--prev { width: calc(max(180 * var(--u), 25vh) + var(--safe-l)); }
-  .whosays .edge--next, .whosays[data-choices="3"] .edge--next { width: calc(max(180 * var(--u), 25vh) + var(--safe-r)); }
+  .guess .edge--prev, .guess[data-choices="3"] .edge--prev { width: calc(max(180 * var(--u), 25vh) + var(--safe-l)); }
+  .guess .edge--next, .guess[data-choices="3"] .edge--next { width: calc(max(180 * var(--u), 25vh) + var(--safe-r)); }
 }
 
 /* Reduced motion: a gentle scale and fade instead of bounce, wiggle and sparkle. */
@@ -873,10 +855,10 @@ button {
 @keyframes gentleB { 0% { transform: scale(1); opacity: 1; } 40% { transform: scale(1.04); opacity: .75; } 100% { transform: scale(1); opacity: 1; } }
 @keyframes glow { 0% { opacity: 0; } 30% { opacity: .9; } 100% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
-  .ws-art.bounce-A, .ws-art.wiggle-A, .ws-ear--A .icon { animation: gentleA 450ms ease; }
-  .ws-art.bounce-B, .ws-art.wiggle-B, .ws-ear--B .icon { animation: gentleB 450ms ease; }
-  .ws-spark { display: none; }
-  .ws-sparkle::before {
+  .gs-art.bounce-A, .gs-art.wiggle-A, .gs-replay--A .icon { animation: gentleA 450ms ease; }
+  .gs-art.bounce-B, .gs-art.wiggle-B, .gs-replay--B .icon { animation: gentleB 450ms ease; }
+  .gs-spark { display: none; }
+  .gs-sparkle::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -884,8 +866,8 @@ button {
     box-shadow: 0 0 0 calc(10 * var(--u)) var(--c-honey);
     animation: glow var(--t-sparkle) ease forwards;
   }
-  .ws-choices.enter-A, .ws-choices.enter-B { animation: none; }
-  .ws-ear:active { transform: none; opacity: .8; }
+  .gs-choices.enter-A, .gs-choices.enter-B { animation: none; }
+  .gs-replay:active { transform: none; opacity: .8; }
 }
 
 /* ---------- 9 · Toddler profile picker ---------- */

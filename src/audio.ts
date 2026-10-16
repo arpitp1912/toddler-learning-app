@@ -182,9 +182,7 @@ async function playSound(item: Item, mine: number, times = SOUND_REPEATS): Promi
 
 /** Word, then sound twice with a short gap. Resolves false if interrupted. */
 async function playItem(item: Item, mine: number): Promise<boolean> {
-  const recorded = item.wordAudio ? await playClip(item.wordAudio) : false;
-  if (mine !== seq) return false;
-  if (!recorded) await speak(item.word);
+  if (!(await playWord(item, mine))) return false;
   return playSound(item, mine);
 }
 
@@ -209,7 +207,7 @@ export async function sayPeekaboo(hint?: { item: Item; volume: number }) {
   if (mine === seq && hint?.item.soundAudio) await playClip(hint.item.soundAudio, hint.volume);
 }
 
-/** Who says that?: "Listen!" (voice-pack prompt `listen`), then the target's sound. */
+/** Guess sound round: "Listen!" (voice-pack prompt `listen`), then the target's sound. */
 export async function sayListen(target: Item) {
   stopAll();
   const mine = seq;
@@ -217,27 +215,56 @@ export async function sayListen(target: Item) {
   if (mine === seq) await playSound(target, mine);
 }
 
-/** Who says that?: the ear button replays the target's sound. */
+/** Guess sound round: the ear button replays the target's sound. */
 export async function replaySound(target: Item) {
   stopAll();
   await playSound(target, seq);
 }
 
+/** An item's word: recorded audio, else the device voice. Resolves false if interrupted. */
+async function playWord(item: Item, mine: number): Promise<boolean> {
+  const recorded = item.wordAudio ? await playClip(item.wordAudio) : false;
+  if (mine !== seq) return false;
+  if (!recorded) await speak(item.word);
+  return mine === seq;
+}
+
+async function playQuestion(target: Item, mine: number) {
+  await sayPrompt('wheres', "Where's the", mine);
+  if (mine === seq) await playWord(target, mine);
+}
+
+/**
+ * Guess word round (Find it): "Where's the" (voice-pack prompt `wheres`, else the
+ * built-in clip, else the device voice), then the target's word. Also the replay button.
+ */
+export async function sayQuestion(target: Item) {
+  stopAll();
+  await playQuestion(target, seq);
+}
+
 const WRONG_PAUSE_MS = 500;
 
 /**
- * Who says that?, wrong tap: the tapped item's word and its own sound (once,
+ * Guess sound round, wrong tap: the tapped item's word and its own sound (once,
  * to keep the detour short), then the target's sound again.
  */
 export async function sayWrong(tapped: Item, target: Item) {
   stopAll();
   const mine = seq;
-  const recorded = tapped.wordAudio ? await playClip(tapped.wordAudio) : false;
-  if (mine !== seq) return;
-  if (!recorded) await speak(tapped.word);
+  if (!(await playWord(tapped, mine))) return;
   if (!(await playSound(tapped, mine, 1))) return;
   await wait(WRONG_PAUSE_MS);
   if (mine === seq) await playSound(target, mine);
+}
+
+/** Guess word round, wrong tap: the tapped item's word, then the question again. */
+export async function sayWrongWord(tapped: Item, target: Item) {
+  stopAll();
+  const mine = seq;
+  if (!(await playWord(tapped, mine))) return;
+  await wait(WRONG_PAUSE_MS);
+  if (mine === seq) await playQuestion(target, mine);
 }
 
 /**

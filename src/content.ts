@@ -2,10 +2,11 @@
 
 export interface Category {
   id: string;
+  /** Parent-facing name ("Vehicles"). The child never sees it. */
+  name?: string;
   module: 'cards' | 'scenes' | 'counting' | 'letters';
   icon: string;
   tint: 'sage' | 'sky' | 'peach' | 'butter' | 'lilac';
-  badge?: 'sound';
 }
 
 export interface Item {
@@ -17,24 +18,29 @@ export interface Item {
   soundAudio?: string;
   anim?: 'bounce' | 'wiggle';
   tags?: string[];
-  /** Used by "Who says that?" (needs a soundAudio too). */
+  /** Usable in Guess sound rounds (needs a soundAudio too). */
   guessable?: boolean;
-  /** Item ids whose sounds are too alike to show together in "Who says that?". Read both ways. */
+  /** Item ids whose sounds are too alike to show together in a Guess sound round. Read both ways. */
   confusableWith?: string[];
+  /** Item ids that look too alike to show together in a Guess word round. Read both ways. */
+  lookalikeWith?: string[];
 }
 
 /** Settings a profile falls back to when it has no value of its own. */
 export type BubbleSpeed = 'slow' | 'normal';
-export type WhoSaysChoices = 2 | 3;
+export type GuessChoices = 2 | 3;
+/** Which Guess rounds play: "Who says that?" sounds, "Find it" words, or both mixed. */
+export type GuessRounds = 'sound' | 'word' | 'both';
 
 export interface ContentDefaults {
   peekabooSoundHint?: boolean;
   bubbleSpeed?: BubbleSpeed;
-  whoSays?: boolean;
-  whoSaysChoices?: WhoSaysChoices;
+  guess?: boolean;
+  guessRounds?: GuessRounds;
+  guessChoices?: GuessChoices;
 }
 
-/** A spoken prompt ("Listen!"). `audio` is the built-in voice; without it the device voice says `text`. */
+/** A spoken prompt ("Listen!", "Where's the"). `audio` is the built-in voice; without it the device voice says `text`. */
 export interface Prompt {
   id: string;
   text: string;
@@ -69,6 +75,9 @@ export async function loadContent(): Promise<Content> {
 
 export const itemsIn = (content: Content, categoryId: string) =>
   content.items.filter((i) => i.category === categoryId);
+
+/** Parent-facing name for a category ("Vehicles"), falling back to its id. */
+export const categoryName = (c: Category) => c.name ?? c.id.charAt(0).toUpperCase() + c.id.slice(1);
 
 export const itemById = (content: Content, id: string) => content.items.find((i) => i.id === id);
 
