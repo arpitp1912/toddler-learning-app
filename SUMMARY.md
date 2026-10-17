@@ -1,6 +1,6 @@
 # Branch summary: `feature/animal-actions`
 
-Created from `main` on 2026-10-17. Not merged. It started as a prototype for the dog. After you approved it, every animal got its own action.
+Created from `main` on 2026-10-17 and merged into `main` on 2026-10-17. It started as a prototype for the dog. After you approved it, every animal got its own action.
 
 ## What was built
 - **Every animal does a motion instead of the bounce.** The card plays the word, then the motion, and the animal's sound plays once at its `peakMs`.
