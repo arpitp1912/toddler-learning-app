@@ -17,7 +17,7 @@ export interface Item {
   wordAudio?: string;
   soundAudio?: string;
   anim?: 'bounce' | 'wiggle';
-  /** Card action replacing the bounce (prototype: the dog only). See src/actions.ts. */
+  /** Card action replacing the bounce. See src/actions.ts. */
   action?: ItemAction;
   /** Pose shown while the action is airborne. Set by `npm run assets` when design/style/<id>-action.png exists. */
   actionImage?: string;
@@ -30,10 +30,18 @@ export interface Item {
   lookalikeWith?: string[];
 }
 
-/** A motion preset, and when in it the item's sound plays (ms from the motion's start). */
+/** Card action motions, tuned in src/actions.ts. */
+export type Motion = 'jump' | 'leap' | 'waddle' | 'peck' | 'flap' | 'rear' | 'headbutt' | 'nod' | 'roar' | 'swim' | 'buzz';
+
+/**
+ * A motion preset, when in it the item's sound plays (ms from the motion's
+ * start; the preset's own peak if left out), and which way the picture faces,
+ * so forward leans and lunges go the right way.
+ */
 export interface ItemAction {
-  motion: 'jump';
+  motion: Motion;
   peakMs?: number;
+  facing?: 'left' | 'right';
 }
 
 /** Settings a profile falls back to when it has no value of its own. */

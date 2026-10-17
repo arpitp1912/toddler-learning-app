@@ -45,6 +45,11 @@
       "image": "img/animals/cow.webp",
       "soundAudio": "audio/sounds/cow.m4a",
       "anim": "bounce",
+      "action": {
+        "motion": "nod",
+        "peakMs": 350,
+        "facing": "left"
+      },
       "guessable": true,
       "tags": [
         "farm"
@@ -58,6 +63,10 @@
       "image": "img/animals/duck.webp",
       "soundAudio": "audio/sounds/duck.m4a",
       "anim": "wiggle",
+      "action": {
+        "motion": "waddle",
+        "peakMs": 450
+      },
       "guessable": true,
       "tags": [
         "farm"
@@ -88,6 +97,10 @@
       "image": "img/animals/cat.webp",
       "soundAudio": "audio/sounds/cat.m4a",
       "anim": "wiggle",
+      "action": {
+        "motion": "jump",
+        "peakMs": 450
+      },
       "guessable": true,
       "tags": [
         "pets"
@@ -101,6 +114,10 @@
       "image": "img/animals/goat.webp",
       "soundAudio": "audio/sounds/goat.m4a",
       "anim": "bounce",
+      "action": {
+        "motion": "headbutt",
+        "peakMs": 480
+      },
       "guessable": true,
       "confusableWith": [
         "sheep"
@@ -120,6 +137,10 @@
       "image": "img/animals/sheep.webp",
       "soundAudio": "audio/sounds/sheep.m4a",
       "anim": "wiggle",
+      "action": {
+        "motion": "nod",
+        "peakMs": 350
+      },
       "guessable": true,
       "confusableWith": [
         "goat"
@@ -136,6 +157,11 @@
       "image": "img/animals/pig.webp",
       "soundAudio": "audio/sounds/pig.m4a",
       "anim": "bounce",
+      "action": {
+        "motion": "waddle",
+        "peakMs": 450,
+        "facing": "left"
+      },
       "guessable": true,
       "tags": [
         "farm"
@@ -149,6 +175,10 @@
       "image": "img/animals/horse.webp",
       "soundAudio": "audio/sounds/horse.m4a",
       "anim": "bounce",
+      "action": {
+        "motion": "rear",
+        "peakMs": 450
+      },
       "guessable": true,
       "tags": [
         "farm"
@@ -162,6 +192,10 @@
       "image": "img/animals/hen.webp",
       "soundAudio": "audio/sounds/hen.m4a",
       "anim": "wiggle",
+      "action": {
+        "motion": "peck",
+        "peakMs": 300
+      },
       "guessable": true,
       "tags": [
         "farm",
@@ -179,6 +213,10 @@
       "image": "img/animals/crow.webp",
       "soundAudio": "audio/sounds/crow.m4a",
       "anim": "wiggle",
+      "action": {
+        "motion": "flap",
+        "peakMs": 400
+      },
       "guessable": true,
       "confusableWith": [
         "parrot"
@@ -198,6 +236,10 @@
       "image": "img/animals/parrot.webp",
       "soundAudio": "audio/sounds/parrot.m4a",
       "anim": "wiggle",
+      "action": {
+        "motion": "flap",
+        "peakMs": 400
+      },
       "guessable": true,
       "confusableWith": [
         "crow"
@@ -214,6 +256,10 @@
       "image": "img/animals/monkey.webp",
       "soundAudio": "audio/sounds/monkey.m4a",
       "anim": "bounce",
+      "action": {
+        "motion": "jump",
+        "peakMs": 450
+      },
       "guessable": true,
       "tags": [
         "wild"
@@ -227,6 +273,10 @@
       "image": "img/animals/elephant.webp",
       "soundAudio": "audio/sounds/elephant.m4a",
       "anim": "bounce",
+      "action": {
+        "motion": "roar",
+        "peakMs": 400
+      },
       "guessable": true,
       "tags": [
         "wild"
@@ -240,6 +290,10 @@
       "image": "img/animals/lion.webp",
       "soundAudio": "audio/sounds/lion.m4a",
       "anim": "bounce",
+      "action": {
+        "motion": "roar",
+        "peakMs": 400
+      },
       "guessable": true,
       "tags": [
         "wild"
@@ -253,6 +307,10 @@
       "image": "img/animals/frog.webp",
       "soundAudio": "audio/sounds/frog.m4a",
       "anim": "bounce",
+      "action": {
+        "motion": "leap",
+        "peakMs": 520
+      },
       "guessable": true,
       "tags": [
         "pond"
@@ -266,6 +324,11 @@
       "image": "img/animals/fish.webp",
       "soundAudio": "audio/sounds/fish.m4a",
       "anim": "wiggle",
+      "action": {
+        "motion": "swim",
+        "peakMs": 300,
+        "facing": "left"
+      },
       "guessable": false,
       "tags": [
         "pond"
@@ -279,6 +342,11 @@
       "image": "img/animals/bee.webp",
       "soundAudio": "audio/sounds/bee.m4a",
       "anim": "wiggle",
+      "action": {
+        "motion": "buzz",
+        "peakMs": 250,
+        "facing": "left"
+      },
       "guessable": true,
       "tags": [
         "garden"
