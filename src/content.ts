@@ -17,6 +17,10 @@ export interface Item {
   wordAudio?: string;
   soundAudio?: string;
   anim?: 'bounce' | 'wiggle';
+  /** Card action replacing the bounce (prototype: the dog only). See src/actions.ts. */
+  action?: ItemAction;
+  /** Pose shown while the action is airborne. Set by `npm run assets` when design/style/<id>-action.png exists. */
+  actionImage?: string;
   tags?: string[];
   /** Usable in Guess sound rounds (needs a soundAudio too). */
   guessable?: boolean;
@@ -24,6 +28,12 @@ export interface Item {
   confusableWith?: string[];
   /** Item ids that look too alike to show together in a Guess word round. Read both ways. */
   lookalikeWith?: string[];
+}
+
+/** A motion preset, and when in it the item's sound plays (ms from the motion's start). */
+export interface ItemAction {
+  motion: 'jump';
+  peakMs?: number;
 }
 
 /** Settings a profile falls back to when it has no value of its own. */

@@ -127,6 +127,17 @@ export function stopAll() {
   if (hasSpeech) speechSynthesis.cancel();
 }
 
+/**
+ * Stops whatever is playing and starts a new sequence. Pass the token to
+ * playWord / playSound; a later sequence makes them stop early.
+ */
+export function newSequence(): number {
+  stopAll();
+  return seq;
+}
+
+export const isCurrent = (mine: number) => mine === seq;
+
 const SOUND_REPEATS = 2;
 const SOUND_GAP_MS = 400;
 
@@ -171,7 +182,7 @@ export async function sayBye() {
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 /** An item's sound, `times` over with the usual gap. Resolves false if interrupted. */
-async function playSound(item: Item, mine: number, times = SOUND_REPEATS): Promise<boolean> {
+export async function playSound(item: Item, mine: number, times = SOUND_REPEATS): Promise<boolean> {
   for (let i = 0; i < times && item.soundAudio; i++) {
     if (i > 0) await wait(SOUND_GAP_MS);
     if (mine !== seq) return false;
@@ -222,7 +233,7 @@ export async function replaySound(target: Item) {
 }
 
 /** An item's word: recorded audio, else the device voice. Resolves false if interrupted. */
-async function playWord(item: Item, mine: number): Promise<boolean> {
+export async function playWord(item: Item, mine: number): Promise<boolean> {
   const recorded = item.wordAudio ? await playClip(item.wordAudio) : false;
   if (mine !== seq) return false;
   if (!recorded) await speak(item.word);

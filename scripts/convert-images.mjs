@@ -1,14 +1,16 @@
 // Converts source PNGs into the WebP assets the app reads (SPEC section 10),
 // and renders the PWA icons. Run with `npm run assets`.
 import sharp from 'sharp';
-import { mkdir, readFile } from 'node:fs/promises';
+import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const SRC = 'design/style';
 const CONTENT = 'public/content';
 
 // Every item and scene image listed in content.json is built from SRC/<id>.png.
-const content = JSON.parse(await readFile(`${CONTENT}/content.json`, 'utf8'));
+const contentFile = `${CONTENT}/content.json`;
+const before = await readFile(contentFile, 'utf8');
+const content = JSON.parse(before);
 
 // Item art has a plain pale background (STYLE.md). Flood-fill it away from the
 // edges so subjects sit cleanly on any tile colour. Only pixels connected to the
@@ -148,9 +150,20 @@ async function webp(src, dest, width, height, quality, { key = false } = {}) {
   console.log(`${dest}  ${width}x${height}  ${(info.size / 1024).toFixed(0)} KB`);
 }
 
-for (const { id, image } of content.items) {
+const exists = (f) => access(f).then(() => true, () => false);
+for (const item of content.items) {
+  const { id, image } = item;
   await webp(`${SRC}/${id}.png`, `${CONTENT}/${image}`, 1024, 1024, 82, { key: true });
+  // Optional action pose (SRC/<id>-action.png), shown mid-action on the card.
+  if (await exists(`${SRC}/${id}-action.png`)) {
+    item.actionImage = image.replace(/\.webp$/, '-action.webp');
+    await webp(`${SRC}/${id}-action.png`, `${CONTENT}/${item.actionImage}`, 1024, 1024, 82, { key: true });
+  } else {
+    delete item.actionImage;
+  }
 }
+const after = JSON.stringify(content, null, 2) + '\n';
+if (after !== before) await writeFile(contentFile, after);
 // Source scene is square; SPEC wants 2048x1536. Kept at native size until the
 // 4:3 scene art is generated (M3).
 for (const { id, image } of content.scenes ?? []) {

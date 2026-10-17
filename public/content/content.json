@@ -71,6 +71,10 @@
       "image": "img/animals/dog.webp",
       "soundAudio": "audio/sounds/dog.m4a",
       "anim": "bounce",
+      "action": {
+        "motion": "jump",
+        "peakMs": 450
+      },
       "guessable": true,
       "tags": [
         "pets"
