@@ -1,4 +1,73 @@
-# Branch summary: `feature/guess-and-home`
+# Branch summary: `feature/animal-actions`
+
+Created from `main` on 2026-10-17. Not merged. This is a **prototype for the dog only**: no other item has an action, and nothing else changes until you approve it.
+
+## What was built
+- **Content:** items can have an optional `action` field, `{ "motion": "jump", "peakMs": 450 }`. Only the dog has one.
+- **Action image:** items can also have an optional `actionImage`, a second pose shown while the item is in the air. `npm run assets` sets it when `design/style/<id>-action.png` exists, and removes it when that file doesn't. The dog has none, so it jumps with its normal picture. I didn't run the converter, so no images changed.
+- **The jump** (`src/actions.ts`): CSS keyframes built from one config object, `JUMP`, using transforms only.
+  - The card moves up and down.
+  - The picture inside squashes, stretches and tilts around its bottom centre, so the dog launches from the ground.
+- **Order of events:** on arrival or tap, the dog card plays the word "dog", then the jump starts. The bark plays once, at `peakMs`, and then the dog settles.
+  - One `requestAnimationFrame` loop reads the CSS animation's own clock and plays the bark when it reaches `peakMs`. There are no chained timeouts.
+  - The bark is preloaded when the card opens, along with every other card's audio, as before.
+- **Re-tap mid-jump:** the word or bark that is playing stops, the dog drops back to the ground while the word plays again, and then the jump restarts. Audio never overlaps.
+- **Reduced motion:** the dog doesn't move. It plays the word, then the bark at `peakMs`. A motionless animation of the same length runs, so the timing works exactly as it does with motion.
+- **Other items** keep their bounce or wiggle, unchanged. Their markup and classes are the same as before.
+- **SPEC.md:** the `action` and `actionImage` fields are in section 9, and there is a decision-log entry.
+
+## Decisions (also in SPEC 14a)
+- **The jump is 900 ms, as you asked.** That is above the 600 ms limit in SPEC section 3. Please judge it on the iPad before we add actions to other animals.
+- **The bark plays once, at the peak,** instead of twice after the word as on other cards. This keeps the sound tied to the jump. I can add a second bark after landing if it feels too short.
+- **The jump also plays when the dog's card first appears,** because every card plays once on arrival (SPEC 14a, 2026-10-12).
+- **`peakMs` has two meanings, kept separate on purpose.** `JUMP.peakMs` is the top of the jump in the animation. The dog's `action.peakMs` in `content.json` is when the bark plays. Both are 450 now.
+
+## How to see the dog on the preview link
+1. Cloudflare built this branch: [build page](https://dash.cloudflare.com/6110e1a2cdaa1647efe742ba91d3f586/workers/services/view/toddler-learning-app/production/previews/feature-animal-actions/builds/ac7fe7ed-fb19-46a5-ab20-496bfe4e296a). Copy the preview URL from that page. It is under Workers → toddler-learning-app → Previews → `feature-animal-actions`.
+2. Open it in Safari on the iPad or iPhone. Use it as a plain tab, not the installed app, so the production app's cache doesn't serve the old version.
+3. Tap Start, then **Look** (the eye), then **Animals** (the cow).
+4. Tap the right edge twice: cow, duck, **dog**. The dog jumps as its card appears. Tap it to jump again.
+5. To check reduced motion, turn on Settings → Accessibility → Motion → Reduce Motion. The dog stays still but still barks at the same moment.
+
+## Tuning values
+Everything is in `JUMP` at the top of `src/actions.ts`, except when the bark plays, which is set per item in `content.json`.
+
+| Value | Now | What it does |
+|---|---|---|
+| `action.peakMs` (dog, `content.json`) | 450 | When the bark plays, in ms from the start of the jump ("bark earlier") |
+| `totalMs` | 900 | Length of the whole jump |
+| `crouchMs` | 200 | End of the crouch, when the dog takes off |
+| `peakMs` | 450 | Top of the jump |
+| `landMs` | 750 | When the feet touch down |
+| `height` | 0.25 | How high it rises, as a fraction of the card height ("jump higher") |
+| `crouch` | scaleX 1.1, scaleY 0.85, tiltDeg −4 | Squash and lean back while crouching |
+| `stretch` | scaleX 0.92, scaleY 1.15, at 0.5 | Stretch on the way up; `at` is how far up the rise the stretch is fullest |
+| `peakTiltDeg` | 4 | Forward lean at the top |
+| `land` | scaleX 1.08, scaleY 0.9 | Squash on landing |
+| `spring` | scaleX 0.97, scaleY 1.03, at 0.5 | Small overshoot while settling |
+| `riseEase` / `fallEase` | ease-out / ease-in curves | How the rise slows and the fall speeds up |
+
+## Tests
+- Type-check and `npm run build` pass. All 309 unit tests pass.
+- **Playwright:** 114 pass, in WebKit and Chromium at 1180×820 and 390×844. The 2 skipped are the existing two-finger Bubbles test in WebKit.
+- **`tests/actions.spec.ts`** is new. Each clip start is tagged with its file and with the jump animation's clock at that moment. It checks that:
+  - tapping the dog starts the jump, and every bark (on arrival and on tap) starts within ±50 ms of 450 ms, after the word has finished, while the dog is in the air;
+  - the dog settles back to rest;
+  - a re-tap during the bark, and one on the way up, never leaves two clips playing at once or a clip playing over the word, and a re-tap before the peak cancels that jump's bark;
+  - under reduced motion the dog doesn't move and the bark still lands at 450 ms;
+  - the cow still bounces and the cat still wiggles, with no action markup;
+  - there are no console errors.
+
+## What to test on the iPad
+- Does the jump read as a jump, and is the bark on the peak to your ear? Real speakers add a little delay that the tests can't measure.
+- Is 900 ms too long for the children?
+- Try fast repeated taps on the dog.
+
+**Waiting for your go-ahead before adding actions to the other animals.**
+
+---
+
+# Earlier branch: `feature/guess-and-home`
 
 Created from `main` on 2026-10-16. Every earlier feature branch (`feature/peekaboo`, `feature/bubbles`, `feature/m2-profiles`, `feature/who-says`, `m1-skeleton`) was already merged into `main`, so nothing was merged into this branch. It was merged into `main` on 2026-10-16, and the first production deploy with `wrangler.jsonc` succeeded.
 
